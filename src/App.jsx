@@ -1,9 +1,19 @@
+import Navbar from "./components/Navbar";
+
 function App() {
   return (
-    <div>
-      <h1>Hezarf App</h1>
-    </div>
+    <>
+      <header>
+        <Navbar />
+      </header>
+      <main>
+
+      </main>
+      <footer>
+
+      </footer>
+    </>
   )
 }
 
-export default App
+export default App;
