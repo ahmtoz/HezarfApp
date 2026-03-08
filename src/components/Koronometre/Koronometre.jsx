@@ -40,19 +40,21 @@ const Koronometre = () => {
     };
 
     return (
-        <div>
-            <div>
-                <h2>{formatTime(time)}</h2>
+        <section className="overflow-hidden py-12 px-16">
+            <div className="flex flex-col items-center justify-center gap-4">
+                <div>
+                    <h2 className="text-4xl font-bold">{formatTime(time)}</h2>
+                </div>
+                <div className="flex gap-4">
+                    <button onClick={handleStartStop} className={`w-16 py-2 text-white rounded-md cursor-pointer transition-colors ${isRunning ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-500 hover:bg-blue-600'}`}>
+                        {isRunning ? 'Stop' : 'Start'}
+                    </button>
+                    <button onClick={handleReset} className="w-16 py-2 bg-green-500 text-white rounded-md cursor-pointer transition-colors hover:bg-green-600">
+                        Reset
+                    </button>
+                </div>
             </div>
-            <div>
-                <button onClick={handleStartStop}>
-                    {isRunning ? 'Stop' : 'Start'}
-                </button>
-                <button onClick={handleReset}>
-                    Reset
-                </button>
-            </div>
-        </div>
+        </section>
     );
 };
 
