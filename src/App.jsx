@@ -1,4 +1,5 @@
 import Navbar from "./components/Navbar";
+import Koronometre from "./components/Koronometre";
 
 function App() {
   return (
@@ -7,7 +8,7 @@ function App() {
         <Navbar />
       </header>
       <main>
-
+        <Koronometre />
       </main>
       <footer>
 
