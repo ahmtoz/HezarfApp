@@ -8,6 +8,7 @@ const Koronometre = () => {
     // Labeling system state
     const [labels, setLabels] = useState({});
     const [labelInput, setLabelInput] = useState('');
+    const [lastLabelTime, setLastLabelTime] = useState(0);
 
     useEffect(() => {
         if (isRunning) {
@@ -29,21 +30,22 @@ const Koronometre = () => {
     const handleReset = () => {
         setIsRunning(false);
         setTime(0);
+        setLastLabelTime(0);
     };
 
     const handleSaveLabel = (e) => {
         e.preventDefault();
         const trimmedLabel = labelInput.trim();
-        if (!trimmedLabel || time === 0) return;
+        const roundTime = time - lastLabelTime;
+        if (!trimmedLabel || roundTime <= 0) return;
 
         setLabels((prev) => ({
             ...prev,
-            [trimmedLabel]: (prev[trimmedLabel] || 0) + time,
+            [trimmedLabel]: (prev[trimmedLabel] || 0) + roundTime,
         }));
 
-        // Reset timer after assigning to a label
-        setIsRunning(false);
-        setTime(0);
+        // Reset label input and update last label time
+        setLastLabelTime(time);
         setLabelInput('');
     };
 
@@ -88,7 +90,7 @@ const Koronometre = () => {
                     />
                     <button
                         type="submit"
-                        disabled={!labelInput.trim() || time === 0}
+                        disabled={!labelInput.trim() || (time - lastLabelTime) <= 0}
                         className="px-6 py-2.5 bg-green-500 text-white font-semibold rounded-lg shadow-sm transition-all hover:bg-green-600 hover:-translate-y-0.5 hover:shadow-green-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
                     >
                         Save Time
