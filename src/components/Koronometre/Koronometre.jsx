@@ -1,4 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#8dd1e1', '#a4de6c', '#d0ed57'];
 
 const Koronometre = () => {
     const [time, setTime] = useState(0);
@@ -61,6 +64,23 @@ const Koronometre = () => {
         return `${formatMinutes}:${formatSeconds}:${formatMilliseconds}`;
     };
 
+    const CustomTooltip = ({ active, payload }) => {
+        if (active && payload && payload.length) {
+            return (
+                <div className="bg-white p-3 border border-gray-200 shadow-sm rounded-lg">
+                    <p className="font-semibold text-gray-800">{payload[0].name}</p>
+                    <p className="text-gray-600 font-mono">{formatTime(payload[0].value)}</p>
+                </div>
+            );
+        }
+        return null;
+    };
+
+    const pieData = Object.entries(labels).map(([name, value]) => ({
+        name,
+        value
+    }));
+
     return (
         <section className="overflow-hidden py-12 px-16">
             <div className="flex flex-col items-center justify-center gap-4 w-fit mx-auto">
@@ -100,20 +120,48 @@ const Koronometre = () => {
 
             {/* Labels List Dashboard */}
             {Object.keys(labels).length > 0 && (
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-                    <h3 className="text-xl font-bold mb-4 text-gray-800 border-b border-gray-100 pb-3 flex items-center gap-2">
-                        <span>📊</span> Subjects Dashboard
-                    </h3>
-                    <ul className="flex flex-col gap-3">
-                        {Object.entries(labels).map(([subject, totalTimeMs]) => (
-                            <li key={subject} className="flex justify-between items-center bg-gray-50/80 hover:bg-gray-50 p-4 rounded-xl border border-gray-100 transition-colors">
-                                <span className="font-semibold text-gray-700">{subject}</span>
-                                <span className="font-mono text-lg font-medium text-gray-900 bg-white px-4 py-1.5 rounded-lg border border-gray-200 shadow-sm">
-                                    {formatTime(totalTimeMs)}
-                                </span>
-                            </li>
-                        ))}
-                    </ul>
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                    <div>
+                        <h3 className="text-xl font-bold mb-4 text-gray-800 border-b border-gray-100 pb-3 flex items-center gap-2">
+                            <span>📊</span> Subjects Dashboard
+                        </h3>
+                        <ul className="flex flex-col gap-3">
+                            {Object.entries(labels).map(([subject, totalTimeMs]) => (
+                                <li key={subject} className="flex justify-between items-center bg-gray-50/80 hover:bg-gray-50 p-4 rounded-xl border border-gray-100 transition-colors">
+                                    <span className="font-semibold text-gray-700">{subject}</span>
+                                    <span className="font-mono text-lg font-medium text-gray-900 bg-white px-4 py-1.5 rounded-lg border border-gray-200 shadow-sm">
+                                        {formatTime(totalTimeMs)}
+                                    </span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Pie Chart Section */}
+                    <div className="flex flex-col items-center justify-center bg-gray-50/50 rounded-xl p-4 border border-gray-100 h-full min-h-[300px]">
+                        <h4 className="font-semibold text-gray-700 mb-2">Time Distribution</h4>
+                        <div className="w-full h-[250px]">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie
+                                        data={pieData}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={60}
+                                        outerRadius={80}
+                                        paddingAngle={5}
+                                        dataKey="value"
+                                    >
+                                        {pieData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip content={<CustomTooltip />} />
+                                    <Legend />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
                 </div>
             )}
         </section>
