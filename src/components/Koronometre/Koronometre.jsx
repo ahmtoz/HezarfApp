@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#8dd1e1', '#a4de6c', '#d0ed57'];
+const SUGGESTED_LABELS = ['Math', 'Reading', 'Coding', 'Science', 'English'];
 
 const Koronometre = () => {
     const [time, setTime] = useState(0);
@@ -159,17 +160,58 @@ const Koronometre = () => {
                     <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in duration-200">
                         <h3 className="text-2xl font-bold text-gray-800 mb-2">Save Elapsed Time</h3>
                         <p className="text-gray-600 mb-6">Enter a label for the recorded time of {formatTime(time - lastLabelTime)}.</p>
-                        
+
                         <form onSubmit={handleSaveLabel}>
                             <input
                                 type="text"
                                 value={labelInput}
                                 onChange={(e) => setLabelInput(e.target.value)}
                                 placeholder="e.g. Math, Reading, Coding"
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all mb-6"
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all mb-4"
                                 autoFocus
                             />
-                            
+
+                            {/* Label Suggestions */}
+                            <div className="mb-6 space-y-4">
+                                {/* Recent Labels */}
+                                {Object.keys(labels).length > 0 && (
+                                    <div>
+                                        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Recent Labels</span>
+                                        <div className="flex flex-wrap gap-2">
+                                            {Object.keys(labels).slice(0, 5).map(label => (
+                                                <button
+                                                    key={label}
+                                                    type="button"
+                                                    onClick={() => setLabelInput(label)}
+                                                    className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors border cursor-pointer ${labelInput === label ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'}`}
+                                                >
+                                                    {label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Suggested Labels */}
+                                {SUGGESTED_LABELS.filter(l => !Object.keys(labels).includes(l)).length > 0 && (
+                                    <div>
+                                        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Suggestions</span>
+                                        <div className="flex flex-wrap gap-2">
+                                            {SUGGESTED_LABELS.filter(l => !Object.keys(labels).includes(l)).map(label => (
+                                                <button
+                                                    key={label}
+                                                    type="button"
+                                                    onClick={() => setLabelInput(label)}
+                                                    className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors border cursor-pointer ${labelInput === label ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'}`}
+                                                >
+                                                    {label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
                             <div className="flex gap-3 justify-end">
                                 <button
                                     type="button"
@@ -177,14 +219,14 @@ const Koronometre = () => {
                                         setIsModalOpen(false);
                                         setLabelInput('');
                                     }}
-                                    className="px-5 py-2.5 text-gray-700 font-medium hover:bg-gray-100 rounded-xl transition-colors"
+                                    className="px-5 py-2.5 text-gray-700 font-medium hover:bg-gray-100 rounded-xl transition-colors cursor-pointer"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={!labelInput.trim()}
-                                    className="px-5 py-2.5 bg-blue-500 text-white font-semibold rounded-xl shadow-sm hover:bg-blue-600 disabled:opacity-50 transition-all hover:-translate-y-0.5"
+                                    className="px-5 py-2.5 bg-blue-500 text-white font-semibold rounded-xl shadow-sm hover:bg-blue-600 disabled:opacity-50 transition-all hover:-translate-y-0.5 cursor-pointer"
                                 >
                                     Save Record
                                 </button>
