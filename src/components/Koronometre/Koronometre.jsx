@@ -12,6 +12,7 @@ const Koronometre = () => {
     const [labels, setLabels] = useState({});
     const [labelInput, setLabelInput] = useState('');
     const [lastLabelTime, setLastLabelTime] = useState(0);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         if (isRunning) {
@@ -27,7 +28,14 @@ const Koronometre = () => {
     }, [isRunning]);
 
     const handleStartStop = () => {
-        setIsRunning(!isRunning);
+        if (isRunning) {
+            setIsRunning(false);
+            if (time - lastLabelTime > 0) {
+                setIsModalOpen(true);
+            }
+        } else {
+            setIsRunning(true);
+        }
     };
 
     const handleReset = () => {
@@ -50,6 +58,7 @@ const Koronometre = () => {
         // Reset label input and update last label time
         setLastLabelTime(time);
         setLabelInput('');
+        setIsModalOpen(false);
     };
 
     const formatTime = (timeInMs) => {
@@ -95,27 +104,6 @@ const Koronometre = () => {
                         Reset
                     </button>
                 </div>
-
-                {/* Label Assignment Form */}
-                <form
-                    onSubmit={handleSaveLabel}
-                    className="flex flex-col sm:flex-row gap-3 w-full max-w-md mt-4 bg-gray-50 p-2 rounded-xl border border-gray-200"
-                >
-                    <input
-                        type="text"
-                        value={labelInput}
-                        onChange={(e) => setLabelInput(e.target.value)}
-                        placeholder="e.g. Math, Reading, Coding"
-                        className="flex-1 px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    />
-                    <button
-                        type="submit"
-                        disabled={!labelInput.trim() || (time - lastLabelTime) <= 0}
-                        className="px-6 py-2.5 bg-green-500 text-white font-semibold rounded-lg shadow-sm transition-all hover:bg-green-600 hover:-translate-y-0.5 hover:shadow-green-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
-                    >
-                        Save Time
-                    </button>
-                </form>
             </div>
 
             {/* Labels List Dashboard */}
@@ -161,6 +149,47 @@ const Koronometre = () => {
                                 </PieChart>
                             </ResponsiveContainer>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Label Modal */}
+            {isModalOpen && (
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in duration-200">
+                        <h3 className="text-2xl font-bold text-gray-800 mb-2">Save Elapsed Time</h3>
+                        <p className="text-gray-600 mb-6">Enter a label for the recorded time of {formatTime(time - lastLabelTime)}.</p>
+                        
+                        <form onSubmit={handleSaveLabel}>
+                            <input
+                                type="text"
+                                value={labelInput}
+                                onChange={(e) => setLabelInput(e.target.value)}
+                                placeholder="e.g. Math, Reading, Coding"
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all mb-6"
+                                autoFocus
+                            />
+                            
+                            <div className="flex gap-3 justify-end">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setIsModalOpen(false);
+                                        setLabelInput('');
+                                    }}
+                                    className="px-5 py-2.5 text-gray-700 font-medium hover:bg-gray-100 rounded-xl transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={!labelInput.trim()}
+                                    className="px-5 py-2.5 bg-blue-500 text-white font-semibold rounded-xl shadow-sm hover:bg-blue-600 disabled:opacity-50 transition-all hover:-translate-y-0.5"
+                                >
+                                    Save Record
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             )}
