@@ -245,17 +245,25 @@ const Koronometre = () => {
                                     <div>
                                         <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Recent Labels</span>
                                         <div className="flex flex-wrap gap-2">
-                                            {Object.entries(labels).slice(0, 5).map(([labelName, labelData]) => (
-                                                <button
-                                                    key={labelName}
-                                                    type="button"
-                                                    onClick={() => { setLabelInput(labelName); setSelectedColor(labelData.color || LABEL_COLORS[0]); }}
-                                                    className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors border cursor-pointer ${labelInput === labelName ? 'bg-gray-100 border-gray-300' : 'bg-white border-gray-200 hover:bg-gray-50'}`}
-                                                >
-                                                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: labelData.color || LABEL_COLORS[0] }}></div>
-                                                    <span style={{ color: labelInput === labelName ? labelData.color || LABEL_COLORS[0] : '#374151' }}>{labelName}</span>
-                                                </button>
-                                            ))}
+                                            {Object.entries(labels).slice(0, 5).map(([labelName, labelData]) => {
+                                                const btnColor = labelData.color || LABEL_COLORS[0];
+                                                const isSelected = labelInput === labelName;
+                                                return (
+                                                    <button
+                                                        key={labelName}
+                                                        type="button"
+                                                        onClick={() => { setLabelInput(labelName); setSelectedColor(btnColor); }}
+                                                        className={`px-4 py-1.5 text-sm font-semibold rounded-xl transition-all border cursor-pointer hover:-translate-y-0.5 ${isSelected ? 'shadow-md shadow-' + btnColor + '/20' : 'hover:opacity-80'}`}
+                                                        style={{ 
+                                                            backgroundColor: isSelected ? btnColor : `${btnColor}15`,
+                                                            borderColor: isSelected ? btnColor : `${btnColor}30`,
+                                                            color: isSelected ? '#ffffff' : btnColor
+                                                        }}
+                                                    >
+                                                        {labelName}
+                                                    </button>
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 )}
@@ -265,17 +273,25 @@ const Koronometre = () => {
                                     <div>
                                         <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Suggestions</span>
                                         <div className="flex flex-wrap gap-2">
-                                            {SUGGESTED_LABELS.filter(l => !Object.keys(labels).includes(l.name)).map(label => (
-                                                <button
-                                                    key={label.name}
-                                                    type="button"
-                                                    onClick={() => { setLabelInput(label.name); setSelectedColor(label.color); }}
-                                                    className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors border cursor-pointer ${labelInput === label.name ? 'bg-gray-100 border-gray-300' : 'bg-white border-gray-200 hover:bg-gray-50'}`}
-                                                >
-                                                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: label.color }}></div>
-                                                    <span style={{ color: labelInput === label.name ? label.color : '#374151' }}>{label.name}</span>
-                                                </button>
-                                            ))}
+                                            {SUGGESTED_LABELS.filter(l => !Object.keys(labels).includes(l.name)).map(label => {
+                                                const btnColor = label.color;
+                                                const isSelected = labelInput === label.name;
+                                                return (
+                                                    <button
+                                                        key={label.name}
+                                                        type="button"
+                                                        onClick={() => { setLabelInput(label.name); setSelectedColor(btnColor); }}
+                                                        className={`px-4 py-1.5 text-sm font-semibold rounded-xl transition-all border cursor-pointer hover:-translate-y-0.5 ${isSelected ? 'shadow-md' : 'hover:opacity-80'}`}
+                                                        style={{ 
+                                                            backgroundColor: isSelected ? btnColor : `${btnColor}15`,
+                                                            borderColor: isSelected ? btnColor : `${btnColor}30`,
+                                                            color: isSelected ? '#ffffff' : btnColor
+                                                        }}
+                                                    >
+                                                        {label.name}
+                                                    </button>
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 )}
