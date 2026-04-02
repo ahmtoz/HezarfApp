@@ -1,8 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#8dd1e1', '#a4de6c', '#d0ed57'];
-const SUGGESTED_LABELS = ['Math', 'Reading', 'Coding', 'Science', 'English'];
+const LABEL_COLORS = [
+    '#ef4444', // Red
+    '#f97316', // Orange
+    '#f59e0b', // Amber
+    '#22c55e', // Green
+    '#06b6d4', // Cyan
+    '#3b82f6', // Blue
+    '#6366f1', // Indigo
+    '#a855f7', // Purple
+    '#ec4899', // Pink
+    '#8b5cf6'  // Violet
+];
+
+const SUGGESTED_LABELS = [
+    { name: 'Math', color: '#3b82f6' },
+    { name: 'Reading', color: '#22c55e' },
+    { name: 'Coding', color: '#8b5cf6' },
+    { name: 'Science', color: '#06b6d4' },
+    { name: 'English', color: '#ec4899' }
+];
 
 const Koronometre = () => {
     const [time, setTime] = useState(0);
@@ -12,6 +30,7 @@ const Koronometre = () => {
     // Labeling system state
     const [labels, setLabels] = useState({});
     const [labelInput, setLabelInput] = useState('');
+    const [selectedColor, setSelectedColor] = useState(LABEL_COLORS[5]); // Default to blue
     const [lastLabelTime, setLastLabelTime] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -51,15 +70,35 @@ const Koronometre = () => {
         const roundTime = time - lastLabelTime;
         if (!trimmedLabel || roundTime <= 0) return;
 
-        setLabels((prev) => ({
-            ...prev,
-            [trimmedLabel]: (prev[trimmedLabel] || 0) + roundTime,
-        }));
+        setLabels((prev) => {
+            const existing = prev[trimmedLabel];
+            return {
+                ...prev,
+                [trimmedLabel]: {
+                    time: (existing?.time || 0) + roundTime,
+                    color: selectedColor
+                }
+            };
+        });
 
         // Reset label input and update last label time
         setLastLabelTime(time);
         setLabelInput('');
+        setSelectedColor(LABEL_COLORS[5]); // Reset to default blue
         setIsModalOpen(false);
+    };
+
+    const handleLabelInputChange = (e) => {
+        const val = e.target.value;
+        setLabelInput(val);
+        if (labels[val]) {
+            setSelectedColor(labels[val].color);
+        } else {
+            const suggested = SUGGESTED_LABELS.find(l => l.name === val);
+            if (suggested) {
+                setSelectedColor(suggested.color);
+            }
+        }
     };
 
     const formatTime = (timeInMs) => {
@@ -86,9 +125,10 @@ const Koronometre = () => {
         return null;
     };
 
-    const pieData = Object.entries(labels).map(([name, value]) => ({
+    const pieData = Object.entries(labels).map(([name, data]) => ({
         name,
-        value
+        value: typeof data === 'object' ? data.time : data, // fallback for safety
+        color: typeof data === 'object' ? data.color : LABEL_COLORS[0]
     }));
 
     return (
@@ -112,14 +152,17 @@ const Koronometre = () => {
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                     <div>
                         <h3 className="text-xl font-bold mb-4 text-gray-800 border-b border-gray-100 pb-3 flex items-center gap-2">
-                            <span>📊</span> Subjects Dashboard
+                            <span>Dashboard</span>
                         </h3>
                         <ul className="flex flex-col gap-3">
-                            {Object.entries(labels).map(([subject, totalTimeMs]) => (
+                            {Object.entries(labels).map(([subject, data]) => (
                                 <li key={subject} className="flex justify-between items-center bg-gray-50/80 hover:bg-gray-50 p-4 rounded-xl border border-gray-100 transition-colors">
-                                    <span className="font-semibold text-gray-700">{subject}</span>
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-3.5 h-3.5 rounded-full shadow-sm" style={{ backgroundColor: data.color || LABEL_COLORS[0] }}></div>
+                                        <span className="font-semibold text-gray-700">{subject}</span>
+                                    </div>
                                     <span className="font-mono text-lg font-medium text-gray-900 bg-white px-4 py-1.5 rounded-lg border border-gray-200 shadow-sm">
-                                        {formatTime(totalTimeMs)}
+                                        {formatTime(data.time || data)}
                                     </span>
                                 </li>
                             ))}
@@ -142,7 +185,7 @@ const Koronometre = () => {
                                         dataKey="value"
                                     >
                                         {pieData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                            <Cell key={`cell-${index}`} fill={entry.color} />
                                         ))}
                                     </Pie>
                                     <Tooltip content={<CustomTooltip />} />
@@ -165,11 +208,35 @@ const Koronometre = () => {
                             <input
                                 type="text"
                                 value={labelInput}
-                                onChange={(e) => setLabelInput(e.target.value)}
+                                onChange={handleLabelInputChange}
                                 placeholder="e.g. Math, Reading, Coding"
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all mb-4"
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all mb-5"
                                 autoFocus
                             />
+
+                            {/* Color Selection */}
+                            <div className="mb-6">
+                                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 block">Color</span>
+                                <div className="flex flex-wrap justify-center sm:justify-start gap-2.5">
+                                    {LABEL_COLORS.map(color => (
+                                        <button
+                                            key={color}
+                                            type="button"
+                                            onClick={() => setSelectedColor(color)}
+                                            className={`w-8 h-8 rounded-full border-2 transition-transform cursor-pointer hover:scale-110 ${selectedColor === color ? 'border-gray-800 scale-110 shadow-md flex items-center justify-center' : 'border-transparent'}`}
+                                            style={{ backgroundColor: color }}
+                                            aria-label={`Select color ${color}`}
+                                            title={`Select color ${color}`}
+                                        >
+                                            {selectedColor === color && (
+                                                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            )}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
 
                             {/* Label Suggestions */}
                             <div className="mb-6 space-y-4">
@@ -178,14 +245,15 @@ const Koronometre = () => {
                                     <div>
                                         <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Recent Labels</span>
                                         <div className="flex flex-wrap gap-2">
-                                            {Object.keys(labels).slice(0, 5).map(label => (
+                                            {Object.entries(labels).slice(0, 5).map(([labelName, labelData]) => (
                                                 <button
-                                                    key={label}
+                                                    key={labelName}
                                                     type="button"
-                                                    onClick={() => setLabelInput(label)}
-                                                    className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors border cursor-pointer ${labelInput === label ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'}`}
+                                                    onClick={() => { setLabelInput(labelName); setSelectedColor(labelData.color || LABEL_COLORS[0]); }}
+                                                    className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors border cursor-pointer ${labelInput === labelName ? 'bg-gray-100 border-gray-300' : 'bg-white border-gray-200 hover:bg-gray-50'}`}
                                                 >
-                                                    {label}
+                                                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: labelData.color || LABEL_COLORS[0] }}></div>
+                                                    <span style={{ color: labelInput === labelName ? labelData.color || LABEL_COLORS[0] : '#374151' }}>{labelName}</span>
                                                 </button>
                                             ))}
                                         </div>
@@ -193,18 +261,19 @@ const Koronometre = () => {
                                 )}
 
                                 {/* Suggested Labels */}
-                                {SUGGESTED_LABELS.filter(l => !Object.keys(labels).includes(l)).length > 0 && (
+                                {SUGGESTED_LABELS.filter(l => !Object.keys(labels).includes(l.name)).length > 0 && (
                                     <div>
                                         <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Suggestions</span>
                                         <div className="flex flex-wrap gap-2">
-                                            {SUGGESTED_LABELS.filter(l => !Object.keys(labels).includes(l)).map(label => (
+                                            {SUGGESTED_LABELS.filter(l => !Object.keys(labels).includes(l.name)).map(label => (
                                                 <button
-                                                    key={label}
+                                                    key={label.name}
                                                     type="button"
-                                                    onClick={() => setLabelInput(label)}
-                                                    className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors border cursor-pointer ${labelInput === label ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'}`}
+                                                    onClick={() => { setLabelInput(label.name); setSelectedColor(label.color); }}
+                                                    className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors border cursor-pointer ${labelInput === label.name ? 'bg-gray-100 border-gray-300' : 'bg-white border-gray-200 hover:bg-gray-50'}`}
                                                 >
-                                                    {label}
+                                                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: label.color }}></div>
+                                                    <span style={{ color: labelInput === label.name ? label.color : '#374151' }}>{label.name}</span>
                                                 </button>
                                             ))}
                                         </div>
