@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
 
 const LABEL_COLORS = [
     '#ef4444', // Red
@@ -116,9 +116,10 @@ const Koronometre = () => {
 
     const CustomTooltip = ({ active, payload }) => {
         if (active && payload && payload.length) {
+            const labelName = payload[0].payload?.name || payload[0].name;
             return (
                 <div className="bg-white p-3 border border-gray-200 shadow-sm rounded-lg">
-                    <p className="font-semibold text-gray-800">{payload[0].name}</p>
+                    <p className="font-semibold text-gray-800">{labelName}</p>
                     <p className="text-gray-600 font-mono">{formatTime(payload[0].value)}</p>
                 </div>
             );
@@ -150,8 +151,8 @@ const Koronometre = () => {
 
             {/* Labels List Dashboard */}
             {Object.keys(labels).length > 0 && (
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-                    <div>
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                    <div className="lg:col-span-1">
                         <h3 className="text-xl font-bold mb-4 text-gray-800 border-b border-gray-100 pb-3 flex items-center gap-2">
                             <span>Dashboard</span>
                         </h3>
@@ -206,6 +207,31 @@ const Koronometre = () => {
                             </ResponsiveContainer>
                         </div>
                     </div>
+
+                    {/* Radar Chart Section */}
+                    {Object.keys(labels).length >= 3 ? (
+                        <div className="flex flex-col items-center justify-center bg-gray-50/50 rounded-xl p-4 border border-gray-100 h-full min-h-[300px]">
+                            <h4 className="font-semibold text-gray-700 mb-2">Performance Radar</h4>
+                            <div className="w-full h-[250px]">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <RadarChart cx="50%" cy="50%" outerRadius="80%" data={pieData}>
+                                        <PolarGrid stroke="#e5e7eb" />
+                                        <PolarAngleAxis dataKey="name" tick={{ fill: '#4b5563', fontSize: 12 }} />
+                                        <PolarRadiusAxis angle={30} domain={[0, 'dataMax']} tick={false} axisLine={false} />
+                                        <Radar name="Time" dataKey="value" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.5} />
+                                        <Tooltip content={<CustomTooltip />} />
+                                    </RadarChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center bg-gray-50/50 rounded-xl p-4 border border-gray-100 h-full min-h-[300px] text-center border-dashed border-2">
+                            <h4 className="font-semibold text-gray-700 mb-2">Performance Radar</h4>
+                            <p className="text-gray-500 text-sm max-w-[200px]">
+                                Add at least 3 labels to see the radar chart pattern.
+                            </p>
+                        </div>
+                    )}
                 </div>
             )}
 
