@@ -33,6 +33,7 @@ const Koronometre = () => {
     const [selectedColor, setSelectedColor] = useState(LABEL_COLORS[5]); // Default to blue
     const [lastLabelTime, setLastLabelTime] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [showAllLabels, setShowAllLabels] = useState(false);
 
     useEffect(() => {
         if (isRunning) {
@@ -155,18 +156,29 @@ const Koronometre = () => {
                             <span>Dashboard</span>
                         </h3>
                         <ul className="flex flex-col gap-3">
-                            {Object.entries(labels).map(([subject, data]) => (
-                                <li key={subject} className="flex justify-between items-center bg-gray-50/80 hover:bg-gray-50 p-4 rounded-xl border border-gray-100 transition-colors">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-3.5 h-3.5 rounded-full shadow-sm" style={{ backgroundColor: data.color || LABEL_COLORS[0] }}></div>
-                                        <span className="font-semibold text-gray-700">{subject}</span>
-                                    </div>
-                                    <span className="font-mono text-lg font-medium text-gray-900 bg-white px-4 py-1.5 rounded-lg border border-gray-200 shadow-sm">
-                                        {formatTime(data.time || data)}
-                                    </span>
-                                </li>
-                            ))}
+                            {Object.entries(labels)
+                                .slice(0, showAllLabels ? undefined : 5)
+                                .map(([subject, data]) => (
+                                    <li key={subject} className="flex justify-between items-center bg-gray-50/80 hover:bg-gray-50 p-4 rounded-xl border border-gray-100 transition-colors overflow-hidden" style={{ backgroundColor: data.color || LABEL_COLORS[0] }}>
+                                        <div className="flex items-center gap-3">
+                                            <span className="font-semibold text-white">{subject}</span>
+                                        </div>
+                                        <span className="font-mono text-lg font-medium text-gray-900 bg-white px-4 py-1.5 rounded-lg border border-gray-200 shadow-sm">
+                                            {formatTime(data.time || data)}
+                                        </span>
+                                    </li>
+                                ))}
                         </ul>
+                        {Object.keys(labels).length > 5 && (
+                            <div className="mt-4 flex justify-center">
+                                <button
+                                    onClick={() => setShowAllLabels(!showAllLabels)}
+                                    className="px-6 py-2 text-sm font-semibold bg-gray-100 text-gray-600 rounded-full hover:bg-gray-200 transition-all hover:scale-105 active:scale-95 cursor-pointer border border-gray-200"
+                                >
+                                    {showAllLabels ? 'Daha Az Göster' : `Diğerlerini Gör (${Object.keys(labels).length - 5}+)`}
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     {/* Pie Chart Section */}
@@ -254,7 +266,7 @@ const Koronometre = () => {
                                                         type="button"
                                                         onClick={() => { setLabelInput(labelName); setSelectedColor(btnColor); }}
                                                         className={`px-4 py-1.5 text-sm font-semibold rounded-xl transition-all border cursor-pointer hover:-translate-y-0.5 ${isSelected ? 'shadow-md shadow-' + btnColor + '/20' : 'hover:opacity-80'}`}
-                                                        style={{ 
+                                                        style={{
                                                             backgroundColor: isSelected ? btnColor : `${btnColor}15`,
                                                             borderColor: isSelected ? btnColor : `${btnColor}30`,
                                                             color: isSelected ? '#ffffff' : btnColor
@@ -282,7 +294,7 @@ const Koronometre = () => {
                                                         type="button"
                                                         onClick={() => { setLabelInput(label.name); setSelectedColor(btnColor); }}
                                                         className={`px-4 py-1.5 text-sm font-semibold rounded-xl transition-all border cursor-pointer hover:-translate-y-0.5 ${isSelected ? 'shadow-md' : 'hover:opacity-80'}`}
-                                                        style={{ 
+                                                        style={{
                                                             backgroundColor: isSelected ? btnColor : `${btnColor}15`,
                                                             borderColor: isSelected ? btnColor : `${btnColor}30`,
                                                             color: isSelected ? '#ffffff' : btnColor
