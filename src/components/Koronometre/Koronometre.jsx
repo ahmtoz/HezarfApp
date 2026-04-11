@@ -266,7 +266,7 @@ const Koronometre = () => {
 
             {/* Label Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
                     <div className="bg-white rounded-2xl shadow-xl w-full max-w-md pt-5 pb-6 animate-in fade-in zoom-in duration-200">
                         <div className="border-b border-[#E2E2E2] px-6 pb-4">
                             <h3 className="text-2xl font-bold text-black">Save tracked time</h3>
@@ -280,26 +280,26 @@ const Koronometre = () => {
                                     value={labelInput}
                                     onChange={handleLabelInputChange}
                                     placeholder="e.g. Math, Reading, Coding"
-                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all mb-5"
+                                    className="w-full px-3 py-2 bg-white text-[#595D62] text-[12px]/[16px] font-bold border border-[#E2E2E2] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all mb-4"
                                     autoFocus
                                 />
 
                                 {/* Color Selection */}
-                                <div className="mb-6">
-                                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 block">Color</span>
-                                    <div className="flex flex-wrap justify-center sm:justify-start gap-2.5">
+                                <div className="mb-4">
+                                    <span className="text-[12px]/[16px] text-black mb-2 block">Colors</span>
+                                    <div className="flex flex-wrap gap-[5px]">
                                         {LABEL_COLORS.map(color => (
                                             <button
                                                 key={color}
                                                 type="button"
                                                 onClick={() => setSelectedColor(color)}
-                                                className={`w-8 h-8 rounded-full border-2 transition-transform cursor-pointer hover:scale-110 ${selectedColor === color ? 'border-gray-800 scale-110 shadow-md flex items-center justify-center' : 'border-transparent'}`}
+                                                className={`w-8 h-8 rounded-full border-1 transition-transform cursor-pointer ${selectedColor === color ? 'border-black flex items-center justify-center' : 'border-transparent'}`}
                                                 style={{ backgroundColor: color }}
                                                 aria-label={`Select color ${color}`}
                                                 title={`Select color ${color}`}
                                             >
                                                 {selectedColor === color && (
-                                                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
                                                     </svg>
                                                 )}
@@ -313,7 +313,7 @@ const Koronometre = () => {
                                     {/* Recent Labels */}
                                     {Object.keys(labels).length > 0 && (
                                         <div>
-                                            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Recent Labels</span>
+                                            <span className="text-[12px]/[16px] text-black mb-2 block">Recent Labels</span>
                                             <div className="flex flex-wrap gap-2">
                                                 {Object.entries(labels).slice(0, 5).map(([labelName, labelData]) => {
                                                     const btnColor = labelData.color || LABEL_COLORS[0];
@@ -323,7 +323,7 @@ const Koronometre = () => {
                                                             key={labelName}
                                                             type="button"
                                                             onClick={() => { setLabelInput(labelName); setSelectedColor(btnColor); }}
-                                                            className={`px-4 py-1.5 text-sm font-semibold rounded-xl transition-all border cursor-pointer hover:-translate-y-0.5 ${isSelected ? 'shadow-md shadow-' + btnColor + '/20' : 'hover:opacity-80'}`}
+                                                            className={`px-2 py-1 text-[14px]/[24px] rounded-xl transition-all border cursor-pointer ${isSelected ? 'shadow-md' : 'hover:opacity-80'}`}
                                                             style={{
                                                                 backgroundColor: isSelected ? btnColor : `${btnColor}15`,
                                                                 borderColor: isSelected ? btnColor : `${btnColor}30`,
@@ -341,7 +341,7 @@ const Koronometre = () => {
                                     {/* Suggested Labels */}
                                     {SUGGESTED_LABELS.filter(l => !Object.keys(labels).includes(l.name)).length > 0 && (
                                         <div>
-                                            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Suggestions</span>
+                                            <span className="text-[12px]/[16px] text-black mb-2 block">Suggestions</span>
                                             <div className="flex flex-wrap gap-2">
                                                 {SUGGESTED_LABELS.filter(l => !Object.keys(labels).includes(l.name)).map(label => {
                                                     const btnColor = label.color;
@@ -351,7 +351,7 @@ const Koronometre = () => {
                                                             key={label.name}
                                                             type="button"
                                                             onClick={() => { setLabelInput(label.name); setSelectedColor(btnColor); }}
-                                                            className={`px-4 py-1.5 text-sm font-semibold rounded-xl transition-all border cursor-pointer hover:-translate-y-0.5 ${isSelected ? 'shadow-md' : 'hover:opacity-80'}`}
+                                                            className={`px-2 py-1 text-[14px]/[24px] rounded-xl transition-all border cursor-pointer ${isSelected ? 'shadow-md' : 'hover:opacity-80'}`}
                                                             style={{
                                                                 backgroundColor: isSelected ? btnColor : `${btnColor}15`,
                                                                 borderColor: isSelected ? btnColor : `${btnColor}30`,
@@ -367,23 +367,23 @@ const Koronometre = () => {
                                     )}
                                 </div>
 
-                                <div className="flex gap-3 justify-end">
+                                <div className="flex gap-2 justify-end">
                                     <button
                                         type="button"
                                         onClick={() => {
                                             setIsModalOpen(false);
                                             setLabelInput('');
                                         }}
-                                        className="px-5 py-2.5 text-gray-700 font-medium hover:bg-gray-100 rounded-xl transition-colors cursor-pointer"
+                                        className="px-3 py-1 text-black hover:bg-gray-100 text-[14px]/[24px] font-bold border border-[#595D62] rounded-xl transition-colors cursor-pointer"
                                     >
                                         Cancel
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={!labelInput.trim()}
-                                        className="px-5 py-2.5 bg-blue-500 text-white font-semibold rounded-xl shadow-sm hover:bg-blue-600 disabled:opacity-50 transition-all hover:-translate-y-0.5 cursor-pointer"
+                                        className="px-3 py-1 bg-[#4E46B4] text-white text-[14px]/[24px] font-bold rounded-xl hover:hover:bg-[#3a358f] disabled:opacity-40 transition-all cursor-pointer"
                                     >
-                                        Save Record
+                                        Save
                                     </button>
                                 </div>
                             </form>
