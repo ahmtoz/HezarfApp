@@ -16,7 +16,7 @@ function Navbar() {
                 />
             </div>
 
-            <div className={`fixed top-0 right-0 h-screen bg-white shadow-2xl z-1 flex flex-col gap-6 pt-12 px-16 transition-transform duration-300 ease-in-out transform ${showMenu ? 'translate-x-0' : 'translate-x-full'} md:static md:h-auto md:flex-row md:justify-between md:bg-[#f5f5f5] md:shadow-none md:p-1 md:gap-1 md:rounded-lg md:translate-x-0 w-full`}>
+            <div className={`fixed top-0 right-0 h-screen bg-white shadow-2xl z-10 flex flex-col gap-6 pt-12 px-16 transition-transform duration-300 ease-in-out transform ${showMenu ? 'translate-x-0' : 'translate-x-full'} md:static md:h-auto md:flex-row md:justify-between md:bg-[#f5f5f5] md:shadow-none md:p-1 md:gap-1 md:rounded-lg md:translate-x-0 w-full`}>
 
                 <ul className="flex flex-col md:flex-row m-0 p-0 list-none">
                     <li className={`rounded-lg transition-colors duration-300 ${activeMenu === "HOME" ? "bg-white" : ""}`}>
@@ -56,7 +56,7 @@ function Navbar() {
             </div>
 
             <button
-                className="hamburger-menu md:hidden flex flex-col justify-between w-6 h-4 cursor-pointer border-none bg-transparent relative z-2 p-0"
+                className="hamburger-menu md:hidden flex flex-col justify-between w-6 h-4 cursor-pointer border-none bg-transparent relative z-11 p-0"
                 onClick={toggleMenu}
                 aria-label="Toggle menu"
                 aria-expanded={showMenu}

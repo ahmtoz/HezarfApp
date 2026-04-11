@@ -159,10 +159,10 @@ const Koronometre = () => {
     }));
 
     return (
-        <section className="overflow-hidden py-25 px-40">
+        <section className="overflow-hidden py-25 px-5 md:px-40">
             <div className="flex flex-col items-center justify-center gap-12 w-fit mx-auto">
                 <div className={`timer-circle-wrapper ${isRunning ? 'is-running' : ''}`}>
-                    <div className="inline-flex items-center gap-1 text-5xl leading-[48px] font-bold tracking-tight text-[#070417] z-10 relative">
+                    <div className="inline-flex items-center gap-1 text-5xl leading-[48px] font-bold tracking-tight text-[#070417] z-5 relative">
                         {formatTime(time)}
                     </div>
                 </div>
@@ -266,7 +266,7 @@ const Koronometre = () => {
 
             {/* Label Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4 md:px-0">
                     <div className="bg-white rounded-2xl shadow-xl w-full max-w-md pt-5 pb-6 animate-in fade-in zoom-in duration-200">
                         <div className="border-b border-[#E2E2E2] px-6 pb-4">
                             <h3 className="text-2xl font-bold text-black">Save tracked time</h3>
