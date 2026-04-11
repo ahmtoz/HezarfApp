@@ -111,7 +111,22 @@ const Koronometre = () => {
         const formatSeconds = seconds.toString().padStart(2, '0');
         const formatMilliseconds = milliseconds.toString().padStart(2, '0');
 
-        return `${formatMinutes}:${formatSeconds}:${formatMilliseconds}`;
+        const divider = (
+            <span className="inline-flex flex-col justify-center gap-[0.25em] mx-[0.05em]">
+                <span className="rounded-full bg-current w-[0.15em] h-[0.15em]"></span>
+                <span className="rounded-full bg-current w-[0.15em] h-[0.15em]"></span>
+            </span>
+        );
+
+        return (
+            <span className="inline-flex items-center">
+                <span className="tabular-nums">{formatMinutes}</span>
+                {divider}
+                <span className="tabular-nums">{formatSeconds}</span>
+                {divider}
+                <span className="tabular-nums">{formatMilliseconds}</span>
+            </span>
+        );
     };
 
     const CustomTooltip = ({ active, payload }) => {
@@ -120,7 +135,7 @@ const Koronometre = () => {
             return (
                 <div className="bg-white p-3 border border-gray-200 shadow-sm rounded-lg">
                     <p className="font-semibold text-gray-800">{labelName}</p>
-                    <p className="text-gray-600 font-mono">{formatTime(payload[0].value)}</p>
+                    <p className="text-gray-600">{formatTime(payload[0].value)}</p>
                 </div>
             );
         }
@@ -134,10 +149,12 @@ const Koronometre = () => {
     }));
 
     return (
-        <section className="overflow-hidden py-12 px-16">
-            <div className="flex flex-col items-center justify-center gap-4 w-fit mx-auto">
-                <div>
-                    <h2 className="text-6xl font-bold font-mono tracking-tight text-gray-800">{formatTime(time)}</h2>
+        <section className="overflow-hidden py-25 px-40">
+            <div className="flex flex-col items-center justify-center gap-6 w-fit mx-auto">
+                <div className={`timer-circle-wrapper ${isRunning ? 'is-running' : ''}`}>
+                    <div className="inline-flex items-center gap-1 text-5xl leading-[48px] font-bold tracking-tight text-[#070417] z-10 relative">
+                        {formatTime(time)}
+                    </div>
                 </div>
                 <div className="flex gap-4">
                     <button onClick={handleStartStop} className={`w-28 py-3 text-lg font-semibold text-white rounded-xl shadow-sm cursor-pointer transition-all hover:-translate-y-0.5 ${isRunning ? 'bg-red-500 hover:bg-red-600 hover:shadow-red-500/30' : 'bg-blue-500 hover:bg-blue-600 hover:shadow-blue-500/30'}`}>
@@ -164,7 +181,7 @@ const Koronometre = () => {
                                         <div className="flex items-center gap-3">
                                             <span className="font-semibold text-white">{subject}</span>
                                         </div>
-                                        <span className="font-mono text-lg font-medium text-gray-900 bg-white px-4 py-1.5 rounded-lg border border-gray-200 shadow-sm">
+                                        <span className="text-lg font-medium text-gray-900 bg-white px-4 py-1.5 rounded-lg border border-gray-200 shadow-sm">
                                             {formatTime(data.time || data)}
                                         </span>
                                     </li>
