@@ -8,7 +8,7 @@ function Navbar() {
     const toggleMenu = () => setShowMenu(!showMenu);
 
     return (
-        <nav className="flex md:justify-start justify-between gap-4 items-center w-full md:pt-15 md:px-30 pt-5 px-5 bg-white max-w-7xl mx-auto">
+        <nav className="flex md:justify-start justify-between gap-4 items-center w-full md:pt-15 md:px-40 pt-5 px-5 bg-white mx-auto" style={{ maxWidth: "1440px" }}>
             <div>
                 <Link to="/">
                     <img
@@ -31,7 +31,7 @@ function Navbar() {
                             HOME
                         </Link>
                     </li>
-                    <li className={`flex items-centerrounded-lg transition-colors duration-300 ${activeMenu === "CONTACT" ? "bg-white" : ""}`}>
+                    <li className={`flex items-center rounded-lg transition-colors duration-300 ${activeMenu === "CONTACT" ? "bg-white" : ""}`}>
                         <Link
                             to="/contact"
                             className="text-sm leading-[24px] font-bold cursor-pointer bg-transparent py-2 px-4 border-none w-full"

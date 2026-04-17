@@ -159,7 +159,7 @@ const Koronometre = () => {
     }));
 
     return (
-        <section className="overflow-hidden py-25 px-5 md:px-40">
+        <section className="pt-15">
             <div className="flex flex-col items-center justify-center gap-12 w-fit mx-auto">
                 <div className={`timer-circle-wrapper ${isRunning ? 'is-running' : ''}`}>
                     <div className="inline-flex items-center gap-1 text-5xl leading-[48px] font-bold tracking-tight text-[#070417] z-5 relative">
