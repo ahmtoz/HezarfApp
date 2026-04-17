@@ -8,7 +8,7 @@ function Navbar() {
     const toggleMenu = () => setShowMenu(!showMenu);
 
     return (
-        <nav className="flex md:justify-start justify-between gap-4 items-center w-full md:pt-15 md:px-40 pt-5 px-5 bg-white mx-auto" style={{ maxWidth: "1440px" }}>
+        <nav className="flex md:justify-start justify-between gap-4 items-center w-full pt-5 md:pt-15 px-5 md:px-10 lg:px-40 bg-white mx-auto" style={{ maxWidth: "1440px" }}>
             <div>
                 <Link to="/">
                     <img
