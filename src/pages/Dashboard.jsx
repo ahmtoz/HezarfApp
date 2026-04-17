@@ -44,9 +44,15 @@ export default function Dashboard() {
                         <img src={activeTab === "Analytics" ? AsideTabAnalytics : activeTab === "To-do List" ? AsideTabTodo : AsideTabCalendar} alt="" />
                         <h1 className='text-xl leading-[24px] text-black'>{activeTab} Overview</h1>
                     </div>
-                    <div className='flex gap-4'>
+                    <div className={`flex gap-4 ${activeTab === "Analytics" ? "" : "hidden"}`}>
                         <TimeAnalytics title="Total Time" time={formatTime(time)} />
                         <TimeAnalytics flexWidth="flex-1" title="Completion of To-do’s" time="00:00:00" />
+                    </div>
+                    <div className={`flex gap-4 ${activeTab === "To-do List" ? "" : "hidden"}`}>
+                        <h1>To-do List</h1>
+                    </div>
+                    <div className={`flex gap-4 ${activeTab === "Calendar" ? "" : "hidden"}`}>
+                        <h1>Calendar</h1>
                     </div>
                 </div>
             </section>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
 import startIcon from '../../assets/img/start.svg';
 import stopIcon from '../../assets/img/stop.svg';
@@ -34,7 +34,7 @@ const Koronometre = () => {
         lastLabelTime, setLastLabelTime
     } = useTimer();
 
-    // Local labeling system state
+    // Labeling system state
     const [labelInput, setLabelInput] = useState('');
     const [selectedColor, setSelectedColor] = useState(LABEL_COLORS[5]); // Default to blue
     const [isModalOpen, setIsModalOpen] = useState(false);
