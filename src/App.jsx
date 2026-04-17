@@ -1,19 +1,24 @@
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
-import Koronometre from "./components/Koronometre";
+import Home from "./pages/Home";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   return (
-    <>
+    <Router>
       <header>
         <Navbar />
       </header>
       <main>
-        <Koronometre />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Routes>
       </main>
       <footer>
 
       </footer>
-    </>
+    </Router>
   )
 }
 
