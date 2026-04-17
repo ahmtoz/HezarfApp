@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
 import startIcon from '../../assets/img/start.svg';
 import stopIcon from '../../assets/img/stop.svg';
 import resetIcon from '../../assets/img/reset.svg';
+import { useTimer } from '../../context/TimerContext';
 
 const LABEL_COLORS = [
     '#ef4444', // Red
@@ -26,30 +27,18 @@ const SUGGESTED_LABELS = [
 ];
 
 const Koronometre = () => {
-    const [time, setTime] = useState(0);
-    const [isRunning, setIsRunning] = useState(false);
-    const timerRef = useRef(null);
+    const {
+        time, setTime,
+        isRunning, setIsRunning,
+        labels, setLabels,
+        lastLabelTime, setLastLabelTime
+    } = useTimer();
 
-    // Labeling system state
-    const [labels, setLabels] = useState({});
+    // Local labeling system state
     const [labelInput, setLabelInput] = useState('');
     const [selectedColor, setSelectedColor] = useState(LABEL_COLORS[5]); // Default to blue
-    const [lastLabelTime, setLastLabelTime] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [showAllLabels, setShowAllLabels] = useState(false);
-
-    useEffect(() => {
-        if (isRunning) {
-            // Update the time every 10 milliseconds
-            timerRef.current = setInterval(() => {
-                setTime((prevTime) => prevTime + 10);
-            }, 10);
-        } else {
-            clearInterval(timerRef.current);
-        }
-
-        return () => clearInterval(timerRef.current);
-    }, [isRunning]);
 
     const handleStartStop = () => {
         if (isRunning) {

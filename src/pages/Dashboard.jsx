@@ -4,9 +4,13 @@ import AsideTabAnalytics from '../assets/img/aside-tab-analytics.svg';
 import AsideTabTodo from '../assets/img/aside-tab-todo.svg';
 import AsideTabCalendar from '../assets/img/aside-tab-calendar.svg';
 
+import { useTimer } from '../context/TimerContext';
+import { formatTime } from '../utils/formatTime';
+
 export default function Dashboard() {
 
     const [activeTab, setActiveTab] = useState("Analytics");
+    const { time } = useTimer();
 
     return (
         <main className="flex gap-6 mx-auto pt-10 pb-12 px-5 md:px-10 lg:px-40" style={{ maxWidth: "1440px", height: "calc(100vh - 118px)" }}>
@@ -41,7 +45,7 @@ export default function Dashboard() {
                         <h1 className='text-xl leading-[24px] text-black'>{activeTab} Overview</h1>
                     </div>
                     <div className='flex gap-4'>
-                        <TimeAnalytics title="Total Time" time="00:00:00" />
+                        <TimeAnalytics title="Total Time" time={formatTime(time)} />
                         <TimeAnalytics flexWidth="flex-1" title="Completion of To-do’s" time="00:00:00" />
                     </div>
                 </div>

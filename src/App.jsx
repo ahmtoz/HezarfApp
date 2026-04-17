@@ -2,10 +2,12 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
+import { TimerProvider } from "./context/TimerContext";
 
 function App() {
   return (
     <Router>
+      <TimerProvider>
       <header>
         <Navbar />
       </header>
@@ -20,6 +22,7 @@ function App() {
       <footer>
 
       </footer>
+      </TimerProvider>
     </Router>
   )
 }
