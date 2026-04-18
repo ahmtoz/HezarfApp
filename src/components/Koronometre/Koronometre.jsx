@@ -151,16 +151,16 @@ const Koronometre = () => {
         <section className="pt-15">
             <div className="flex flex-col items-center justify-center gap-12 w-fit mx-auto">
                 <div className={`timer-circle-wrapper ${isRunning ? 'is-running' : ''}`}>
-                    <div className="inline-flex items-center gap-1 text-5xl leading-[48px] font-bold tracking-tight text-[#070417] z-5 relative">
+                    <div className="inline-flex items-center gap-1 text-5xl leading-[48px] font-bold tracking-tight text-dark z-5 relative">
                         {formatTime(time)}
                     </div>
                 </div>
                 <div className="flex gap-6">
-                    <button onClick={handleStartStop} className={`flex items-center justify-center gap-2 ps-2 pe-4 py-2 rounded-xl cursor-pointer transition-all duration-300 ${isRunning ? 'bg-[#D33030] hover:bg-[#b82828]' : 'bg-[#4E46B4] hover:bg-[#3a358f]'}`}>
+                    <button onClick={handleStartStop} className={`flex items-center justify-center gap-2 ps-2 pe-4 py-2 rounded-xl cursor-pointer transition-all duration-300 ${isRunning ? 'bg-secondary hover:bg-secondary-hover' : 'bg-primary hover:bg-primary-hover'}`}>
                         <img src={isRunning ? stopIcon : startIcon} alt="" className='w-6 h-6' />
                         <span className="text-[14px]/[24px] text-white font-bold">{isRunning ? 'Stop' : 'Start'}</span>
                     </button>
-                    <button onClick={handleReset} className="flex items-center justify-center gap-2 ps-2 pe-4 py-2 rounded-xl bg-white border border-[#595D62] cursor-pointer transition-all duration-300 hover:brightness-90">
+                    <button onClick={handleReset} className="flex items-center justify-center gap-2 ps-2 pe-4 py-2 rounded-xl bg-white border border-gray-dark cursor-pointer transition-all duration-300 hover:brightness-90">
                         <img src={resetIcon} alt="" className='w-6 h-6' />
                         <span className="text-[14px]/[24px] text-black font-bold">Reset</span>
                     </button>
@@ -257,7 +257,7 @@ const Koronometre = () => {
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4 md:px-0">
                     <div className="bg-white rounded-2xl shadow-xl w-full max-w-md pt-5 pb-6 animate-in fade-in zoom-in duration-200">
-                        <div className="border-b border-[#E2E2E2] px-6 pb-4">
+                        <div className="border-b border-gray-light px-6 pb-4">
                             <h3 className="text-2xl font-bold text-black">Save tracked time</h3>
                         </div>
                         <div className="flex flex-col px-6 pt-4">
@@ -269,7 +269,7 @@ const Koronometre = () => {
                                     value={labelInput}
                                     onChange={handleLabelInputChange}
                                     placeholder="e.g. Math, Reading, Coding"
-                                    className="w-full px-3 py-2 bg-white text-[#595D62] text-[12px]/[16px] font-bold border border-[#E2E2E2] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all mb-4"
+                                    className="w-full px-3 py-2 bg-white text-gray-dark text-[12px]/[16px] font-bold border border-gray-light rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all mb-4"
                                     autoFocus
                                 />
 
@@ -363,14 +363,14 @@ const Koronometre = () => {
                                             setIsModalOpen(false);
                                             setLabelInput('');
                                         }}
-                                        className="px-3 py-1 text-black hover:bg-gray-100 text-[14px]/[24px] font-bold border border-[#595D62] rounded-xl transition-colors cursor-pointer"
+                                        className="px-3 py-1 text-black hover:bg-gray-100 text-[14px]/[24px] font-bold border border-gray-dark rounded-xl transition-colors cursor-pointer"
                                     >
                                         Cancel
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={!labelInput.trim()}
-                                        className="px-3 py-1 bg-[#4E46B4] text-white text-[14px]/[24px] font-bold rounded-xl hover:hover:bg-[#3a358f] disabled:opacity-40 transition-all cursor-pointer"
+                                        className="px-3 py-1 bg-primary text-white text-[14px]/[24px] font-bold rounded-xl hover:bg-primary-hover disabled:opacity-40 transition-all cursor-pointer"
                                     >
                                         Save
                                     </button>

@@ -14,7 +14,7 @@ export default function Dashboard() {
 
     return (
         <main className="flex gap-6 mx-auto pt-10 pb-12 px-5 md:px-10 lg:px-40" style={{ maxWidth: "1440px", height: "calc(100vh - 118px)" }}>
-            <aside className="flex flex-col gap-6 w-[286px] h-full p-4 bg-[#F5F5F5] rounded-lg">
+            <aside className="flex flex-col gap-6 w-[286px] h-full p-4 bg-light-gray rounded-lg">
                 <div>
                     <ul>
                         <li>
@@ -38,7 +38,7 @@ export default function Dashboard() {
                     </ul>
                 </div>
             </aside>
-            <section className="flex-1 p-6 bg-[#F5F5F5] rounded-lg">
+            <section className="flex-1 p-6 bg-light-gray rounded-lg">
                 <div className="flex flex-col gap-4">
                     <div className='flex items-center gap-3 bg-white rounded-lg p-2 mx-2'>
                         <img src={activeTab === "Analytics" ? AsideTabAnalytics : activeTab === "To-do List" ? AsideTabTodo : AsideTabCalendar} alt="" />

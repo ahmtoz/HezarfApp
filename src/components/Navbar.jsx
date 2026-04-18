@@ -19,7 +19,7 @@ function Navbar() {
                 </Link>
             </div>
 
-            <div className={`fixed top-0 right-0 h-screen bg-white shadow-2xl z-10 flex flex-col gap-6 pt-12 px-16 transition-transform duration-300 ease-in-out transform ${showMenu ? 'translate-x-0' : 'translate-x-full'} md:static md:h-auto md:flex-row md:justify-between md:bg-[#f5f5f5] md:shadow-none md:p-1 md:gap-1 md:rounded-lg md:translate-x-0 w-full`}>
+            <div className={`fixed top-0 right-0 h-screen bg-white shadow-2xl z-10 flex flex-col gap-6 pt-12 px-16 transition-transform duration-300 ease-in-out transform ${showMenu ? 'translate-x-0' : 'translate-x-full'} md:static md:h-auto md:flex-row md:justify-between md:bg-light-gray md:shadow-none md:p-1 md:gap-1 md:rounded-lg md:translate-x-0 w-full`}>
 
                 <ul className="flex flex-col md:flex-row m-0 p-0 list-none">
                     <li className={`flex items-center rounded-lg transition-colors duration-300 ${activeMenu === "HOME" ? "bg-white" : ""}`}>
@@ -69,7 +69,7 @@ function Navbar() {
                     </Link>
                     <Link
                         to="/signup"
-                        className="text-sm leading-[24px] font-bold cursor-pointer bg-transparent py-2 px-4 rounded-lg transition-colors duration-300 border-solid border-1 border-[#595D62]"
+                        className="text-sm leading-[24px] font-bold cursor-pointer bg-transparent py-2 px-4 rounded-lg transition-colors duration-300 border-solid border-1 border-gray-dark"
                     >
                         Sign Up
                     </Link>
