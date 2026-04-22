@@ -7,49 +7,68 @@ const TimerContext = createContext();
 export const TimerProvider = ({ children }) => {
     const { user, loading: authLoading } = useAuth();
 
-    const [time, setTime] = useState(0);
+    const [time, setTime] = useState(() => {
+        const savedTime = localStorage.getItem('hezarf_time');
+        return savedTime ? parseInt(savedTime, 10) : 0;
+    });
+    const [lastLabelTime, setLastLabelTime] = useState(() => {
+        const savedLastLabel = localStorage.getItem('hezarf_lastLabelTime');
+        return savedLastLabel ? parseInt(savedLastLabel, 10) : 0;
+    });
+
     const [isRunning, setIsRunning] = useState(false);
     const [labels, setLabels] = useState({});
-    const [lastLabelTime, setLastLabelTime] = useState(0);
     const [dataLoaded, setDataLoaded] = useState(false);
 
     const timerRef = useRef(null);
     const timeRef = useRef(time);
 
-    // Başlangıç verilerini yükleme
     useEffect(() => {
         if (authLoading) return;
 
         const loadData = async () => {
             if (user) {
-                // Giriş yapmış kullanıcı için Supabase'den çek
-                const { data, error } = await supabase
-                    .from('user_timers')
-                    .select('time, labels, lastLabelTime')
-                    .eq('user_id', user.id)
-                    .single();
+                try {
+                    const { data: dbLabels, error: labelsError } = await supabase
+                        .from('labels')
+                        .select('*')
+                        .eq('user_id', user.id);
 
-                if (data) {
-                    setTime(data.time || 0);
-                    setLabels(data.labels || {});
-                    setLastLabelTime(data.lastLabelTime || 0);
-                } else if (error && error.code === 'PGRST116') {
-                    // Kayıt yoksa oluştur (PGRST116: no rows returned)
-                    await supabase.from('user_timers').insert([{ user_id: user.id }]);
-                    setTime(0);
-                    setLabels({});
-                    setLastLabelTime(0);
+                    if (labelsError) throw labelsError;
+
+                    const { data: dbLogs, error: logsError } = await supabase
+                        .from('time_logs')
+                        .select('*')
+                        .eq('user_id', user.id);
+
+                    if (logsError) throw logsError;
+
+                    // Format: { "Math": { id: "uuid", time: 5000, color: "#blue" } }
+                    const aggregatedLabels = {};
+
+                    if (dbLabels) {
+                        dbLabels.forEach(l => {
+                            aggregatedLabels[l.name] = { id: l.id, time: 0, color: l.color };
+                        });
+                    }
+
+                    if (dbLogs && dbLabels) {
+                        dbLogs.forEach(log => {
+                            const label = dbLabels.find(l => l.id === log.label_id);
+                            if (label && aggregatedLabels[label.name]) {
+                                aggregatedLabels[label.name].time += (log.duration_seconds * 1000);
+                            }
+                        });
+                    }
+
+                    setLabels(aggregatedLabels);
+                } catch (error) {
+                    console.error("Supabase Veri Çekme Hatası:", error);
                 }
             } else {
                 // Ziyaretçi için LocalStorage'dan çek
-                const savedTime = localStorage.getItem('hezarf_time');
-                setTime(savedTime ? parseInt(savedTime, 10) : 0);
-
                 const savedLabels = localStorage.getItem('hezarf_labels');
                 setLabels(savedLabels ? JSON.parse(savedLabels) : {});
-
-                const savedLastLabel = localStorage.getItem('hezarf_lastLabelTime');
-                setLastLabelTime(savedLastLabel ? parseInt(savedLastLabel, 10) : 0);
             }
             setDataLoaded(true);
         };
@@ -57,45 +76,26 @@ export const TimerProvider = ({ children }) => {
         loadData();
     }, [user, authLoading]);
 
-    // Time güncellemeleri
     useEffect(() => {
-        if (!dataLoaded) return;
-
         timeRef.current = time;
         if (time > 0 && time % 1000 === 0) {
             localStorage.setItem('hezarf_time', time.toString());
         }
+    }, [time]);
 
-        // Supabase için daha seyrek güncelleme (örneğin her 5 saniyede bir)
-        if (user && time > 0 && time % 5000 === 0) {
-            supabase.from('user_timers').update({ time }).eq('user_id', user.id).then();
-        }
-    }, [time, user, dataLoaded]);
-
-    // Labels güncellemeleri
+    // Ziyaretçiler için labels değiştiğinde LocalStorage'a kaydet
     useEffect(() => {
         if (!dataLoaded) return;
-
-        localStorage.setItem('hezarf_labels', JSON.stringify(labels));
-        if (user) {
-            supabase.from('user_timers').update({ labels }).eq('user_id', user.id).then();
+        if (!user) {
+            localStorage.setItem('hezarf_labels', JSON.stringify(labels));
         }
     }, [labels, user, dataLoaded]);
 
-    // LastLabelTime güncellemeleri
     useEffect(() => {
-        if (!dataLoaded) return;
-
         localStorage.setItem('hezarf_lastLabelTime', lastLabelTime.toString());
-        if (user) {
-            supabase.from('user_timers').update({ lastLabelTime }).eq('user_id', user.id).then();
-        }
-    }, [lastLabelTime, user, dataLoaded]);
+    }, [lastLabelTime]);
 
-    // Timer kontrolü
     useEffect(() => {
-        if (!dataLoaded) return;
-
         if (isRunning) {
             timerRef.current = setInterval(() => {
                 setTime((prevTime) => prevTime + 10);
@@ -103,14 +103,72 @@ export const TimerProvider = ({ children }) => {
         } else {
             clearInterval(timerRef.current);
             localStorage.setItem('hezarf_time', timeRef.current.toString());
-            if (user) {
-                // Durdurulduğunda son durumu kesin kaydet
-                supabase.from('user_timers').update({ time: timeRef.current }).eq('user_id', user.id).then();
-            }
         }
 
         return () => clearInterval(timerRef.current);
-    }, [isRunning, user, dataLoaded]);
+    }, [isRunning]);
+
+    const saveTimerLog = async (name, color, durationMs) => {
+        if (durationMs <= 0) return;
+
+        setLabels(prev => {
+            const existing = prev[name];
+            return {
+                ...prev,
+                [name]: {
+                    ...existing,
+                    time: (existing?.time || 0) + durationMs,
+                    color: color
+                }
+            };
+        });
+
+        setLastLabelTime(prev => prev + durationMs);
+
+        // Veritabanı İşlemleri
+        if (user) {
+            try {
+                let labelId = null;
+
+                const { data: existingLabel, error: checkError } = await supabase
+                    .from('labels')
+                    .select('id')
+                    .eq('user_id', user.id)
+                    .eq('name', name)
+                    .maybeSingle();
+
+                if (existingLabel) {
+                    labelId = existingLabel.id;
+                } else {
+                    const { data: newLabel, error: insertError } = await supabase
+                        .from('labels')
+                        .insert([{ user_id: user.id, name, color }])
+                        .select()
+                        .single();
+
+                    if (insertError) {
+                        console.error("Etiket kaydetme hatası:", insertError);
+                        return;
+                    }
+                    if (newLabel) {
+                        labelId = newLabel.id;
+                        setLabels(prev => ({ ...prev, [name]: { ...prev[name], id: labelId } }));
+                    }
+                }
+
+                const durationSeconds = Math.round(durationMs / 1000);
+                if (durationSeconds > 0 && labelId) {
+                    const { error: logError } = await supabase
+                        .from('time_logs')
+                        .insert([{ user_id: user.id, label_id: labelId, duration_seconds: durationSeconds }]);
+
+                    if (logError) console.error("Time log kaydetme hatası:", logError);
+                }
+            } catch (err) {
+                console.error("Kayıt işlemi sırasında hata:", err);
+            }
+        }
+    };
 
     return (
         <TimerContext.Provider value={{
@@ -118,8 +176,8 @@ export const TimerProvider = ({ children }) => {
             isRunning, setIsRunning,
             labels, setLabels,
             lastLabelTime, setLastLabelTime,
+            saveTimerLog
         }}>
-            {/* Veriler yüklenene kadar UI gösterilmesini engellemek için */}
             {dataLoaded ? children : null}
         </TimerContext.Provider>
     );
