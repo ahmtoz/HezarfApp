@@ -31,7 +31,7 @@ const Koronometre = () => {
         time, setTime,
         isRunning, setIsRunning,
         labels, setLabels,
-        lastLabelTime, setLastLabelTime
+        lastLabelTime, setLastLabelTime,
     } = useTimer();
 
     // Labeling system state

@@ -1,10 +1,15 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../assets/img/hezarfapp_logo.png";
+import LoginModal from "./LoginModal";
+import { useAuth } from "../context/AuthContext";
 
 function Navbar() {
     const [showMenu, setShowMenu] = useState(false);
     const [activeMenu, setActiveMenu] = useState("HOME");
+    const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+    const { user, signOut } = useAuth();
+
     const toggleMenu = () => setShowMenu(!showMenu);
 
     return (
@@ -61,18 +66,26 @@ function Navbar() {
                 </ul>
 
                 <div className="flex flex-col md:flex-row gap-2">
-                    <Link
-                        to="/login"
-                        className="text-sm leading-[24px] font-bold cursor-pointer bg-transparent py-2 px-4 rounded-lg transition-colors duration-300 border-none"
-                    >
-                        Login
-                    </Link>
-                    <Link
-                        to="/signup"
-                        className="text-sm leading-[24px] font-bold cursor-pointer bg-transparent py-2 px-4 rounded-lg transition-colors duration-300 border-solid border-1 border-gray-dark"
-                    >
-                        Sign Up
-                    </Link>
+                    {user ? (
+                        <>
+                            <span className="text-sm leading-[24px] font-bold py-2 px-2 flex items-center truncate max-w-[150px]" title={user.email}>
+                                {user.email.split('@')[0]}
+                            </span>
+                            <button
+                                onClick={signOut}
+                                className="text-sm leading-[24px] font-bold cursor-pointer bg-black text-white py-2 px-4 rounded-lg transition-colors duration-300 border-none hover:bg-gray-800"
+                            >
+                                Çıkış Yap
+                            </button>
+                        </>
+                    ) : (
+                        <button
+                            onClick={() => setIsLoginModalOpen(true)}
+                            className="text-sm leading-[24px] font-bold cursor-pointer bg-black text-white py-2 px-4 rounded-lg transition-colors duration-300 border-none hover:bg-gray-800"
+                        >
+                            Log in
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -86,6 +99,11 @@ function Navbar() {
                 <span className={`bar w-full h-0.5 bg-black rounded transition-all duration-300 ${showMenu ? 'opacity-0' : ''}`}></span>
                 <span className={`bar w-full h-0.5 bg-black rounded transition-all duration-300 origin-center ${showMenu ? '-rotate-45 -translate-y-[7px]' : ''}`}></span>
             </button>
+
+            <LoginModal
+                isOpen={isLoginModalOpen}
+                onClose={() => setIsLoginModalOpen(false)}
+            />
         </nav>
     )
 }
