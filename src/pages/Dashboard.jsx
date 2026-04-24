@@ -10,7 +10,10 @@ import { formatTime } from '../utils/formatTime';
 export default function Dashboard() {
 
     const [activeTab, setActiveTab] = useState("Analytics");
-    const { time } = useTimer();
+    const { labels } = useTimer();
+
+    // Calculate total time from all labels fetched from Supabase
+    const totalTimeMs = Object.values(labels || {}).reduce((total, label) => total + (label.time || 0), 0);
 
     return (
         <main className="flex gap-6 mx-auto pt-10 pb-12 px-5 md:px-10 lg:px-40" style={{ maxWidth: "1440px", height: "calc(100vh - 118px)" }}>
@@ -45,7 +48,7 @@ export default function Dashboard() {
                         <h1 className='text-xl leading-[24px] text-black'>{activeTab} Overview</h1>
                     </div>
                     <div className={`flex gap-4 ${activeTab === "Analytics" ? "" : "hidden"}`}>
-                        <TimeAnalytics title="Total Time" time={formatTime(time)} />
+                        <TimeAnalytics title="Total Time" time={formatTime(totalTimeMs)} />
                         <TimeAnalytics flexWidth="flex-1" title="Completion of To-do’s" time="00:00:00" />
                     </div>
                     <div className={`flex gap-4 ${activeTab === "To-do List" ? "" : "hidden"}`}>

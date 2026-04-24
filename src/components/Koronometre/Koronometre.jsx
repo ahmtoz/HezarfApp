@@ -37,7 +37,7 @@ const Koronometre = () => {
 
     // Labeling system state
     const [labelInput, setLabelInput] = useState('');
-    const [selectedColor, setSelectedColor] = useState(LABEL_COLORS[5]); // Default to blue
+    const [selectedColor, setSelectedColor] = useState(LABEL_COLORS[5]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [showAllLabels, setShowAllLabels] = useState(false);
 
@@ -58,14 +58,13 @@ const Koronometre = () => {
         setLastLabelTime(0);
     };
 
-    const handleSaveLabel = async (e) => {
+    const handleSaveLabel = (e) => {
         e.preventDefault();
         const trimmedLabel = labelInput.trim();
         const roundTime = time - lastLabelTime;
         if (!trimmedLabel || roundTime <= 0) return;
 
-        // Yeni Supabase uyumlu kayıt fonksiyonu
-        await saveTimerLog(trimmedLabel, selectedColor, roundTime);
+        saveTimerLog(trimmedLabel, selectedColor, roundTime);
 
         // Formu sıfırla
         setLabelInput('');

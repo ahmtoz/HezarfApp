@@ -56,7 +56,11 @@ export const TimerProvider = ({ children }) => {
                         dbLogs.forEach(log => {
                             const label = dbLabels.find(l => l.id === log.label_id);
                             if (label && aggregatedLabels[label.name]) {
-                                aggregatedLabels[label.name].time += (log.duration_seconds * 1000);
+                                // Prefer duration_ms, fallback to duration_seconds for old data
+                                const duration = log.duration_ms !== undefined && log.duration_ms !== null
+                                    ? log.duration_ms
+                                    : (log.duration_seconds * 1000);
+                                aggregatedLabels[label.name].time += duration;
                             }
                         });
                     }
@@ -156,11 +160,15 @@ export const TimerProvider = ({ children }) => {
                     }
                 }
 
-                const durationSeconds = Math.round(durationMs / 1000);
-                if (durationSeconds > 0 && labelId) {
+                if (durationMs > 0 && labelId) {
                     const { error: logError } = await supabase
                         .from('time_logs')
-                        .insert([{ user_id: user.id, label_id: labelId, duration_seconds: durationSeconds }]);
+                        .insert([{
+                            user_id: user.id,
+                            label_id: labelId,
+                            duration_ms: durationMs,
+                            duration_seconds: Math.round(durationMs / 1000)
+                        }]);
 
                     if (logError) console.error("Time log kaydetme hatası:", logError);
                 }
