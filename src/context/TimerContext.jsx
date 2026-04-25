@@ -22,6 +22,7 @@ export const TimerProvider = ({ children }) => {
 
     const timerRef = useRef(null);
     const timeRef = useRef(time);
+    const lastSavedTimeRef = useRef(time);
 
     useEffect(() => {
         if (authLoading) return;
@@ -82,8 +83,9 @@ export const TimerProvider = ({ children }) => {
 
     useEffect(() => {
         timeRef.current = time;
-        if (time > 0 && time % 1000 === 0) {
+        if (Math.abs(time - lastSavedTimeRef.current) >= 1000 || time === 0) {
             localStorage.setItem('hezarf_time', time.toString());
+            lastSavedTimeRef.current = time;
         }
     }, [time]);
 
@@ -102,7 +104,10 @@ export const TimerProvider = ({ children }) => {
     useEffect(() => {
         if (isRunning) {
             timerRef.current = setInterval(() => {
-                setTime((prevTime) => prevTime + 10);
+                const now = Date.now();
+                const delta = now - lastTick;
+                lastTick = now;
+                setTime((prevTime) => prevTime + delta);
             }, 10);
         } else {
             clearInterval(timerRef.current);
