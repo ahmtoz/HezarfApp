@@ -103,6 +103,7 @@ export const TimerProvider = ({ children }) => {
 
     useEffect(() => {
         if (isRunning) {
+            let lastTick = Date.now();
             timerRef.current = setInterval(() => {
                 const now = Date.now();
                 const delta = now - lastTick;

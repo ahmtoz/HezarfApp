@@ -6,7 +6,7 @@ export default function TimeAnalytics({ flexWidth, title, time }) {
     const [activeTime, setActiveTime] = useState("DAILY");
 
     return (
-        <article className={`flex ${flexWidth} flex-col gap-3 p-6 bg-white rounded-3xl`}>
+        <article className={`flex ${flexWidth} flex-col gap-3 p-4 bg-white rounded-2xl`}>
             <header className="flex items-center gap-2">
                 <img src={TimeAnalyticsIcon} alt="" />
                 <h2>{title}</h2>

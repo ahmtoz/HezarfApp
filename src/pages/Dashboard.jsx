@@ -3,9 +3,12 @@ import TimeAnalytics from '../components/Dashboard/Time-Analytics';
 import AsideTabAnalytics from '../assets/img/aside-tab-analytics.svg';
 import AsideTabTodo from '../assets/img/aside-tab-todo.svg';
 import AsideTabCalendar from '../assets/img/aside-tab-calendar.svg';
+import SpiderChartAnalyticsIcon from '../assets/img/spider-chart-analytics-icon.svg';
+import PieChartAnalyticsIcon from '../assets/img/pie-chart-analytics-icon.svg';
 
 import { useTimer } from '../context/TimerContext';
 import { formatTime } from '../utils/formatTime';
+import { TimePieChart, TimeRadarChart } from '../components/Charts';
 
 export default function Dashboard() {
 
@@ -15,9 +18,15 @@ export default function Dashboard() {
     // Calculate total time from all labels fetched from Supabase
     const totalTimeMs = Object.values(labels || {}).reduce((total, label) => total + (label.time || 0), 0);
 
+    const pieData = Object.entries(labels || {}).map(([name, data]) => ({
+        name,
+        value: typeof data === 'object' ? data.time : data,
+        color: typeof data === 'object' ? data.color : '#3b82f6'
+    }));
+
     return (
-        <main className="flex gap-6 mx-auto pt-10 pb-12 px-5 md:px-10 lg:px-40" style={{ maxWidth: "1440px", height: "calc(100vh - 118px)" }}>
-            <aside className="flex flex-col gap-6 w-[286px] h-full p-4 bg-light-gray rounded-lg">
+        <main className="flex gap-6 mx-auto pt-10 pb-12 px-5 md:px-10 lg:px-40 max-w-[1440px]">
+            <aside className="flex flex-col gap-6 w-[286px] h-auto p-4 bg-light-gray rounded-lg">
                 <div>
                     <ul>
                         <li>
@@ -50,6 +59,14 @@ export default function Dashboard() {
                     <div className={`flex gap-4 ${activeTab === "Analytics" ? "" : "hidden"}`}>
                         <TimeAnalytics title="Total Time" time={formatTime(totalTimeMs)} />
                         <TimeAnalytics flexWidth="flex-1" title="Completion of To-do’s" time="00:00:00" />
+                    </div>
+                    <div className={`flex gap-4 ${activeTab === "Analytics" ? "" : "hidden"}`}>
+                        <div className="flex-1">
+                            <TimeRadarChart data={pieData} formatTime={formatTime} icon={SpiderChartAnalyticsIcon} title="Spider Chart" />
+                        </div>
+                        <div className="flex-1">
+                            <TimePieChart data={pieData} formatTime={formatTime} icon={PieChartAnalyticsIcon} title="Pie Chart" />
+                        </div>
                     </div>
                     <div className={`flex gap-4 ${activeTab === "To-do List" ? "" : "hidden"}`}>
                         <h1>To-do List</h1>
