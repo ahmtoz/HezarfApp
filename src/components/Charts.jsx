@@ -39,7 +39,7 @@ export const TimePieChart = ({ data, formatTime, title, icon }) => {
                                 ))}
                             </Pie>
                             <Tooltip content={<CustomTooltip formatTime={formatTime} />} />
-                            <Legend />
+                            <Legend iconType="circle" iconSize={20} wrapperStyle={{ paddingTop: '20px' }} />
                         </PieChart>
                     </ResponsiveContainer>
                 </div>
@@ -117,7 +117,10 @@ export const TimeLineChart = ({ data, colors, formatTime, formatYAxis, title, ic
                                 tick={{ fill: '#6b7280', fontSize: 12 }}
                                 tickFormatter={(val) => {
                                     if (val === 0) return "0";
-                                    if (formatYAxis) return formatYAxis(val);
+                                    if (formatTime) {
+                                        const formatted = formatTime(val);
+                                        return formatted ? String(formatted).split(' ')[0] : val;
+                                    }
                                     return val;
                                 }}
                             />

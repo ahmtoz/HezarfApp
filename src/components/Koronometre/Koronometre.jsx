@@ -7,24 +7,22 @@ import resetIcon from '../../assets/img/reset.svg';
 import { useTimer } from '../../context/TimerContext';
 
 const LABEL_COLORS = [
-    '#ef4444', // Red
-    '#f97316', // Orange
-    '#f59e0b', // Amber
-    '#22c55e', // Green
-    '#06b6d4', // Cyan
-    '#3b82f6', // Blue
+    '#EF4444', // Red
+    '#F97316', // Orange
+    '#FFCE65', // Amber
+    '#06B6D4', // Water Blue
+    '#3B82F6', // Cyan
     '#6366f1', // Indigo
-    '#a855f7', // Purple
-    '#ec4899', // Pink
-    '#8b5cf6'  // Violet
+    '#8B5CF6', // Purple
+    '#A855F7', // Pink
+    '#EC4899'  // Violet
 ];
 
 const SUGGESTED_LABELS = [
-    { name: 'Math', color: '#3b82f6' },
-    { name: 'Reading', color: '#22c55e' },
-    { name: 'Coding', color: '#8b5cf6' },
-    { name: 'Science', color: '#06b6d4' },
-    { name: 'English', color: '#ec4899' }
+    { name: 'Math', color: '#06B6D4' },
+    { name: 'Coding', color: '#8B5CF6' },
+    { name: 'Reading', color: '#FFCE65' },
+    { name: 'Language', color: '#EC4899' }
 ];
 
 const Koronometre = () => {
@@ -130,9 +128,13 @@ const Koronometre = () => {
 
     return (
         <section className="pt-15">
+            <div className="flex flex-col gap-4 mb-16">
+                <p className="text-[32px]/[40px] tracking-tight text-black font-bold">Welcome aboard</p>
+                <h1 className="text-[40px]/[48px] tracking-tight text-black font-bold">Start tracking your time.</h1>
+            </div>
             <div className="flex flex-col items-center justify-center gap-12 w-fit mx-auto">
                 <div className={`timer-circle-wrapper ${isRunning ? 'is-running' : ''}`}>
-                    <div className="inline-flex items-center gap-1 text-5xl leading-[48px] font-bold tracking-tight text-dark z-5 relative">
+                    <div className="inline-flex items-center gap-1 text-dark z-5 relative">
                         {formatTime(time)}
                     </div>
                 </div>
@@ -150,24 +152,22 @@ const Koronometre = () => {
 
             {/* Labels List Dashboard */}
             {Object.keys(labels).length > 0 && (
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                <div className="bg-white p-6 rounded-2xl border border-[#C6C6C8] mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
                     <div className="lg:col-span-1">
-                        <h3 className="text-xl font-bold mb-4 text-gray-800 border-b border-gray-100 pb-3 flex items-center gap-2">
-                            <span>Dashboard</span>
-                        </h3>
                         <ul className="flex flex-col gap-3">
                             {Object.entries(labels)
                                 .slice(0, showAllLabels ? undefined : 5)
                                 .map(([subject, data]) => (
-                                    <li key={subject} className="flex justify-between items-center bg-gray-50/80 hover:bg-gray-50 p-4 rounded-xl border border-gray-100 transition-colors overflow-hidden" style={{ backgroundColor: data.color || LABEL_COLORS[0] }}>
-                                        <div className="flex items-center gap-3">
-                                            <span className="font-semibold text-white">{subject}</span>
+                                    <li key={subject} className="flex justify-between items-center px-4 py-3 rounded-xl border-2 overflow-hidden" style={{ backgroundColor: `${data.color}60` || LABEL_COLORS[0], borderColor: `color-mix(in srgb, ${data.color}, black 40%)` }}>
+                                        <div className="text-base flex items-center gap-3">
+                                            <span className="font-bold text-black">{subject}</span>
                                         </div>
-                                        <span className="text-lg font-medium text-gray-900 bg-white px-4 py-1.5 rounded-lg border border-gray-200 shadow-sm">
+                                        <span className="text-base font-medium text-black bg-white px-3 rounded-lg">
                                             {formatTime(data.time || data)}
                                         </span>
                                     </li>
-                                ))}
+                                )
+                                )}
                         </ul>
                         {Object.keys(labels).length > 5 && (
                             <div className="mt-4 flex justify-center">
@@ -175,19 +175,19 @@ const Koronometre = () => {
                                     onClick={() => setShowAllLabels(!showAllLabels)}
                                     className="px-6 py-2 text-sm font-semibold bg-gray-100 text-gray-600 rounded-full hover:bg-gray-200 transition-all hover:scale-105 active:scale-95 cursor-pointer border border-gray-200"
                                 >
-                                    {showAllLabels ? 'Daha Az Göster' : `Diğerlerini Gör (${Object.keys(labels).length - 5}+)`}
+                                    {showAllLabels ? 'Show Less' : `Show More (${Object.keys(labels).length - 5}+)`}
                                 </button>
                             </div>
                         )}
                     </div>
 
                     {/* Pie Chart Section */}
-                    <div className="h-full min-h-[300px]">
+                    <div className="h-full">
                         <TimePieChart data={pieData} formatTime={formatTime} />
                     </div>
 
                     {/* Radar Chart Section */}
-                    <div className="h-full min-h-[300px]">
+                    <div className="h-full">
                         <TimeRadarChart data={pieData} formatTime={formatTime} />
                     </div>
                 </div>
@@ -252,11 +252,10 @@ const Koronometre = () => {
                                                             key={labelName}
                                                             type="button"
                                                             onClick={() => { setLabelInput(labelName); setSelectedColor(btnColor); }}
-                                                            className={`px-2 py-1 text-[14px]/[24px] rounded-xl transition-all border cursor-pointer ${isSelected ? 'shadow-md' : 'hover:opacity-80'}`}
+                                                            className={`px-2 py-1 text-[14px]/[24px] text-black rounded-md transition-all border cursor-pointer ${isSelected ? '' : 'hover:opacity-80'}`}
                                                             style={{
-                                                                backgroundColor: isSelected ? btnColor : `${btnColor}15`,
-                                                                borderColor: isSelected ? btnColor : `${btnColor}30`,
-                                                                color: isSelected ? '#ffffff' : btnColor
+                                                                backgroundColor: isSelected ? `${btnColor}80` : `${btnColor}40`,
+                                                                borderColor: btnColor,
                                                             }}
                                                         >
                                                             {labelName}
@@ -280,11 +279,10 @@ const Koronometre = () => {
                                                             key={label.name}
                                                             type="button"
                                                             onClick={() => { setLabelInput(label.name); setSelectedColor(btnColor); }}
-                                                            className={`px-2 py-1 text-[14px]/[24px] rounded-xl transition-all border cursor-pointer ${isSelected ? 'shadow-md' : 'hover:opacity-80'}`}
+                                                            className={`px-2 py-1 text-[14px]/[24px] text-black rounded-md transition-all border cursor-pointer ${isSelected ? '' : 'hover:opacity-80'}`}
                                                             style={{
-                                                                backgroundColor: isSelected ? btnColor : `${btnColor}15`,
-                                                                borderColor: isSelected ? btnColor : `${btnColor}30`,
-                                                                color: isSelected ? '#ffffff' : btnColor
+                                                                backgroundColor: isSelected ? `${btnColor}80` : `${btnColor}40`,
+                                                                borderColor: btnColor
                                                             }}
                                                         >
                                                             {label.name}
