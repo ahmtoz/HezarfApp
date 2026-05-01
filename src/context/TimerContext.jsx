@@ -18,6 +18,7 @@ export const TimerProvider = ({ children }) => {
 
     const [isRunning, setIsRunning] = useState(false);
     const [labels, setLabels] = useState({});
+    const [logs, setLogs] = useState([]);
     const [dataLoaded, setDataLoaded] = useState(false);
 
     const timerRef = useRef(null);
@@ -54,6 +55,7 @@ export const TimerProvider = ({ children }) => {
                     }
 
                     if (dbLogs && dbLabels) {
+                        setLogs(dbLogs);
                         dbLogs.forEach(log => {
                             const label = dbLabels.find(l => l.id === log.label_id);
                             if (label && aggregatedLabels[label.name]) {
@@ -74,6 +76,9 @@ export const TimerProvider = ({ children }) => {
                 // Ziyaretçi için LocalStorage'dan çek
                 const savedLabels = localStorage.getItem('hezarf_labels');
                 setLabels(savedLabels ? JSON.parse(savedLabels) : {});
+
+                const savedLogs = localStorage.getItem('hezarf_logs');
+                setLogs(savedLogs ? JSON.parse(savedLogs) : []);
             }
             setDataLoaded(true);
         };
@@ -94,8 +99,9 @@ export const TimerProvider = ({ children }) => {
         if (!dataLoaded) return;
         if (!user) {
             localStorage.setItem('hezarf_labels', JSON.stringify(labels));
+            localStorage.setItem('hezarf_logs', JSON.stringify(logs));
         }
-    }, [labels, user, dataLoaded]);
+    }, [labels, logs, user, dataLoaded]);
 
     useEffect(() => {
         localStorage.setItem('hezarf_lastLabelTime', lastLabelTime.toString());
@@ -167,20 +173,36 @@ export const TimerProvider = ({ children }) => {
                 }
 
                 if (durationMs > 0 && labelId) {
-                    const { error: logError } = await supabase
-                        .from('time_logs')
-                        .insert([{
-                            user_id: user.id,
-                            label_id: labelId,
-                            duration_ms: durationMs,
-                            duration_seconds: Math.round(durationMs / 1000)
-                        }]);
+                    const newLog = {
+                        user_id: user.id,
+                        label_id: labelId,
+                        duration_ms: durationMs,
+                        duration_seconds: Math.round(durationMs / 1000),
+                    };
 
-                    if (logError) console.error("Time log kaydetme hatası:", logError);
+                    const { data: insertedLog, error: logError } = await supabase
+                        .from('time_logs')
+                        .insert([newLog])
+                        .select()
+                        .single();
+
+                    if (logError) {
+                        console.error("Time log kaydetme hatası:", logError);
+                    } else if (insertedLog) {
+                        setLogs(prev => [...prev, insertedLog]);
+                    }
                 }
             } catch (err) {
                 console.error("Kayıt işlemi sırasında hata:", err);
             }
+        } else if (!user && durationMs > 0) {
+            const visitorLog = {
+                id: Math.random().toString(36).substring(7),
+                label_id: name,
+                duration_ms: durationMs,
+                created_at: new Date().toISOString()
+            };
+            setLogs(prev => [...prev, visitorLog]);
         }
     };
 
@@ -189,6 +211,7 @@ export const TimerProvider = ({ children }) => {
             time, setTime,
             isRunning, setIsRunning,
             labels, setLabels,
+            logs, setLogs,
             lastLabelTime, setLastLabelTime,
             saveTimerLog
         }}>

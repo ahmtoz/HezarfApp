@@ -8,12 +8,12 @@ import PieChartAnalyticsIcon from '../assets/img/pie-chart-analytics-icon.svg';
 
 import { useTimer } from '../context/TimerContext';
 import { formatTime } from '../utils/formatTime';
-import { TimePieChart, TimeRadarChart } from '../components/Charts';
+import { TimePieChart, TimeRadarChart, TimeLineChart } from '../components/Charts';
 
 export default function Dashboard() {
 
     const [activeTab, setActiveTab] = useState("Analytics");
-    const { labels } = useTimer();
+    const { labels, logs } = useTimer();
 
     // Calculate total time from all labels fetched from Supabase
     const totalTimeMs = Object.values(labels || {}).reduce((total, label) => total + (label.time || 0), 0);
@@ -23,6 +23,53 @@ export default function Dashboard() {
         value: typeof data === 'object' ? data.time : data,
         color: typeof data === 'object' ? data.color : '#3b82f6'
     }));
+
+    const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+    // Get current week's Monday 00:00:00
+    const now = new Date();
+    const currentDay = now.getDay();
+    const diffToMonday = now.getDate() - currentDay + (currentDay === 0 ? -6 : 1);
+    const startOfWeek = new Date(now.setDate(diffToMonday));
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    const weeklyDataMap = {};
+    daysOfWeek.forEach(day => {
+        weeklyDataMap[day] = { day };
+        Object.keys(labels || {}).forEach(labelName => {
+            weeklyDataMap[day][labelName] = 0;
+        });
+    });
+
+    if (logs && Array.isArray(logs)) {
+        logs.forEach(log => {
+            if (!log.created_at) return;
+            const logDate = new Date(log.created_at);
+            if (logDate >= startOfWeek) {
+                const dayIndex = logDate.getDay() === 0 ? 6 : logDate.getDay() - 1;
+                const dayName = daysOfWeek[dayIndex];
+
+                const labelName = Object.keys(labels || {}).find(name =>
+                    labels[name].id === log.label_id || name === log.label_id
+                );
+
+                if (labelName && dayName && weeklyDataMap[dayName]) {
+                    const duration = log.duration_ms !== undefined && log.duration_ms !== null
+                        ? log.duration_ms
+                        : (log.duration_seconds ? log.duration_seconds * 1000 : 0);
+
+                    weeklyDataMap[dayName][labelName] = (weeklyDataMap[dayName][labelName] || 0) + duration;
+                }
+            }
+        });
+    }
+
+    const weeklyData = Object.values(weeklyDataMap);
+
+    const colors = {};
+    Object.entries(labels || {}).map(([name, data]) => {
+        colors[name] = data.color;
+    });
 
     return (
         <main className="flex gap-6 mx-auto pt-10 pb-12 px-5 md:px-10 lg:px-40 max-w-[1440px]">
@@ -66,6 +113,17 @@ export default function Dashboard() {
                         </div>
                         <div className="flex-1">
                             <TimePieChart data={pieData} formatTime={formatTime} icon={PieChartAnalyticsIcon} title="Pie Chart" />
+                        </div>
+                    </div>
+                    <div className={`flex gap-4 ${activeTab === "Analytics" ? "" : "hidden"}`}>
+                        <div className="flex-1">
+                            <TimeLineChart
+                                data={weeklyData}
+                                colors={colors}
+                                formatTime={formatTime}
+                                icon={AsideTabAnalytics}
+                                title="Time Overview"
+                            />
                         </div>
                     </div>
                     <div className={`flex gap-4 ${activeTab === "To-do List" ? "" : "hidden"}`}>
