@@ -33,13 +33,13 @@ export default function Dashboard() {
     const startOfWeek = new Date(now.setDate(diffToMonday));
     startOfWeek.setHours(0, 0, 0, 0);
 
-    const weeklyDataMap = {};
-    daysOfWeek.forEach(day => {
-        weeklyDataMap[day] = { day };
-        Object.keys(labels || {}).forEach(labelName => {
-            weeklyDataMap[day][labelName] = 0;
-        });
-    });
+    const currentDayIndex = currentDay === 0 ? 6 : currentDay - 1;
+
+    // 1. Calculate daily sums and weekly totals
+    const dailySums = {};
+    const weekTotals = {};
+    daysOfWeek.forEach(day => { dailySums[day] = {}; });
+    Object.keys(labels || {}).forEach(labelName => { weekTotals[labelName] = 0; });
 
     if (logs && Array.isArray(logs)) {
         logs.forEach(log => {
@@ -48,21 +48,47 @@ export default function Dashboard() {
             if (logDate >= startOfWeek) {
                 const dayIndex = logDate.getDay() === 0 ? 6 : logDate.getDay() - 1;
                 const dayName = daysOfWeek[dayIndex];
-
+                
                 const labelName = Object.keys(labels || {}).find(name =>
                     labels[name].id === log.label_id || name === log.label_id
                 );
 
-                if (labelName && dayName && weeklyDataMap[dayName]) {
+                if (labelName && dayName) {
                     const duration = log.duration_ms !== undefined && log.duration_ms !== null
                         ? log.duration_ms
                         : (log.duration_seconds ? log.duration_seconds * 1000 : 0);
-
-                    weeklyDataMap[dayName][labelName] = (weeklyDataMap[dayName][labelName] || 0) + duration;
+                    
+                    dailySums[dayName][labelName] = (dailySums[dayName][labelName] || 0) + duration;
+                    weekTotals[labelName] = (weekTotals[labelName] || 0) + duration;
                 }
             }
         });
     }
+
+    // 2. Build cumulative data map
+    const weeklyDataMap = {};
+    const cumulativeSums = {};
+    Object.keys(labels || {}).forEach(labelName => { cumulativeSums[labelName] = 0; });
+
+    daysOfWeek.forEach((day, index) => {
+        weeklyDataMap[day] = { day };
+        Object.keys(labels || {}).forEach(labelName => {
+            // Only include labels that were used this week
+            if (weekTotals[labelName] > 0) {
+                if (index <= currentDayIndex) {
+                    // Accumulate time for past and current days
+                    cumulativeSums[labelName] += (dailySums[day][labelName] || 0);
+                    weeklyDataMap[day][labelName] = cumulativeSums[labelName];
+                } else {
+                    // For future days, either set to null (line stops) or keep flat.
+                    // The user requested it to stay where it left off, so we keep the cumulative sum flat.
+                    // Setting to null stops the line at today instead of drawing a flat line to Sunday.
+                    // Using null is the professional best practice for future dates.
+                    weeklyDataMap[day][labelName] = null; 
+                }
+            }
+        });
+    });
 
     const weeklyData = Object.values(weeklyDataMap);
 

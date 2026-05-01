@@ -117,11 +117,15 @@ export const TimeLineChart = ({ data, colors, formatTime, formatYAxis, title, ic
                                 tick={{ fill: '#6b7280', fontSize: 12 }}
                                 tickFormatter={(val) => {
                                     if (val === 0) return "0";
-                                    if (formatTime) {
-                                        const formatted = formatTime(val);
-                                        return formatted ? String(formatted).split(' ')[0] : val;
+                                    const minutes = Math.floor(val / 60000);
+                                    const seconds = Math.floor((val % 60000) / 1000);
+                                    if (minutes === 0) return `${seconds}s`;
+                                    if (minutes >= 60) {
+                                        const hours = Math.floor(minutes / 60);
+                                        const remainingMins = minutes % 60;
+                                        return remainingMins > 0 ? `${hours}h ${remainingMins}m` : `${hours}h`;
                                     }
-                                    return val;
+                                    return `${minutes}m`;
                                 }}
                             />
                             <Tooltip
