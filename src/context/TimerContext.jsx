@@ -31,6 +31,11 @@ export const TimerProvider = ({ children }) => {
     const [labels, setLabels] = useState({});
     const [logs, setLogs] = useState([]);
     const [dataLoaded, setDataLoaded] = useState(false);
+    
+    const [hiddenLabels, setHiddenLabels] = useState(() => {
+        const savedHidden = localStorage.getItem('hezarf_hiddenLabels');
+        return savedHidden ? JSON.parse(savedHidden) : [];
+    });
 
     const timerRef = useRef(null);
     const timeRef = useRef(time);
@@ -118,6 +123,10 @@ export const TimerProvider = ({ children }) => {
         localStorage.setItem('hezarf_lastLabelTime', lastLabelTime.toString());
     }, [lastLabelTime]);
 
+    useEffect(() => {
+        localStorage.setItem('hezarf_hiddenLabels', JSON.stringify(hiddenLabels));
+    }, [hiddenLabels]);
+
 
     useEffect(() => {
         if (isRunning) {
@@ -148,6 +157,9 @@ export const TimerProvider = ({ children }) => {
 
     const saveTimerLog = async (name, color, durationMs) => {
         if (durationMs <= 0) return;
+
+        // Ensure the label is visible if it was previously hidden
+        setHiddenLabels(prev => prev.filter(l => l !== name));
 
         setLabels(prev => {
             const existing = prev[name];
@@ -228,14 +240,91 @@ export const TimerProvider = ({ children }) => {
         }
     };
 
+    const clearLabel = (name) => {
+        setHiddenLabels(prev => {
+            if (!prev.includes(name)) return [...prev, name];
+            return prev;
+        });
+    };
+
+    const deleteLabel = async (id, name) => {
+        setLabels(prev => {
+            const newLabels = { ...prev };
+            delete newLabels[name];
+            return newLabels;
+        });
+        setLogs(prev => prev.filter(log => log.label_id !== id && log.label_id !== name));
+        
+        // Ensure it's removed from hidden labels if deleted
+        setHiddenLabels(prev => prev.filter(l => l !== name));
+
+        if (user && id) {
+            try {
+                const { error: logsError } = await supabase
+                    .from('time_logs')
+                    .delete()
+                    .eq('label_id', id);
+                
+                if (logsError) console.error("Time log delete error:", logsError);
+
+                const { error: labelError } = await supabase
+                    .from('labels')
+                    .delete()
+                    .eq('id', id);
+
+                if (labelError) console.error("Label delete error:", labelError);
+            } catch (err) {
+                console.error("Delete operation failed:", err);
+            }
+        }
+    };
+
+    const clearAllLabels = () => {
+        setHiddenLabels(Object.keys(labels));
+    };
+
+    const deleteAllLabels = async () => {
+        setLabels({});
+        setLogs([]);
+        setHiddenLabels([]);
+
+        if (user) {
+            try {
+                const { error: logsError } = await supabase
+                    .from('time_logs')
+                    .delete()
+                    .eq('user_id', user.id);
+                
+                if (logsError) console.error("All time logs delete error:", logsError);
+
+                const { error: labelsError } = await supabase
+                    .from('labels')
+                    .delete()
+                    .eq('user_id', user.id);
+
+                if (labelsError) console.error("All labels delete error:", labelsError);
+            } catch (err) {
+                console.error("Delete all operation failed:", err);
+            }
+        }
+    };
+
+    const visibleLabels = Object.fromEntries(
+        Object.entries(labels).filter(([name]) => !hiddenLabels.includes(name))
+    );
+
     return (
         <TimerContext.Provider value={{
             time, setTime,
             isRunning, setIsRunning,
-            labels, setLabels,
+            labels: visibleLabels, setLabels,
             logs, setLogs,
             lastLabelTime, setLastLabelTime,
-            saveTimerLog
+            saveTimerLog,
+            clearLabel,
+            deleteLabel,
+            clearAllLabels,
+            deleteAllLabels
         }}>
             {dataLoaded ? children : null}
         </TimerContext.Provider>

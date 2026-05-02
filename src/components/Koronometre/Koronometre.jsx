@@ -4,6 +4,7 @@ import { TimePieChart, TimeRadarChart } from '../Charts';
 import startIcon from '../../assets/img/start.svg';
 import stopIcon from '../../assets/img/stop.svg';
 import resetIcon from '../../assets/img/reset.svg';
+import bulkIcon from '../../assets/img/label-trash.svg';
 import { useTimer } from '../../context/TimerContext';
 
 const LABEL_COLORS = [
@@ -32,6 +33,8 @@ const Koronometre = () => {
         labels, setLabels,
         lastLabelTime, setLastLabelTime,
         saveTimerLog,
+        clearLabel, deleteLabel,
+        clearAllLabels, deleteAllLabels
     } = useTimer();
 
     // Labeling system state
@@ -39,6 +42,23 @@ const Koronometre = () => {
     const [selectedColor, setSelectedColor] = useState(LABEL_COLORS[5]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [showAllLabels, setShowAllLabels] = useState(false);
+    const [activeDropdown, setActiveDropdown] = useState(null);
+    const [deleteModalData, setDeleteModalData] = useState(null);
+    const [bulkDropdownOpen, setBulkDropdownOpen] = useState(false);
+    const [bulkDeleteModalOpen, setBulkDeleteModalOpen] = useState(false);
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (activeDropdown && !e.target.closest('.label-item')) {
+                setActiveDropdown(null);
+            }
+            if (bulkDropdownOpen && !e.target.closest('.bulk-actions-btn')) {
+                setBulkDropdownOpen(false);
+            }
+        };
+        document.addEventListener('click', handleClickOutside);
+        return () => document.removeEventListener('click', handleClickOutside);
+    }, [activeDropdown, bulkDropdownOpen]);
 
     const handleStartStop = () => {
         if (isRunning) {
@@ -152,19 +172,80 @@ const Koronometre = () => {
 
             {/* Labels List Dashboard */}
             {Object.keys(labels).length > 0 && (
-                <div className="bg-white p-6 rounded-2xl border border-[#C6C6C8] mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                <div className="bg-white p-6 rounded-2xl border border-[#C6C6C8] mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8 items-start relative">
+
+                    {/* Bulk Actions Button */}
+                    <div className="absolute -top-12 right-0 z-30 bulk-actions-btn">
+                        <button
+                            onClick={() => setBulkDropdownOpen(!bulkDropdownOpen)}
+                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer text-gray-500"
+                            aria-label="Bulk options"
+                        >
+                            <img src={bulkIcon} alt="" className='w-6 h-6' />
+                        </button>
+                        {bulkDropdownOpen && (
+                            <div className="absolute right-0 w-48 bg-white border border-gray-200 rounded-xl shadow-lg z-40 py-1 overflow-hidden">
+                                <button
+                                    onClick={() => { clearAllLabels(); setBulkDropdownOpen(false); }}
+                                    className="w-full text-left px-4 py-2 hover:bg-gray-50 flex flex-col cursor-pointer transition-colors"
+                                >
+                                    <span className="text-sm font-semibold text-gray-800">Clear All</span>
+                                    <span className="text-[10px] text-gray-500">hide all from UI</span>
+                                </button>
+                                <button
+                                    onClick={() => { setBulkDeleteModalOpen(true); setBulkDropdownOpen(false); }}
+                                    className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 flex flex-col cursor-pointer transition-colors border-t border-gray-100"
+                                >
+                                    <span className="text-sm font-semibold">Delete All</span>
+                                    <span className="text-[10px] text-red-400">permanently delete all data</span>
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
                     <div className="lg:col-span-1">
                         <ul className="flex flex-col gap-3">
                             {Object.entries(labels)
                                 .slice(0, showAllLabels ? undefined : 5)
                                 .map(([subject, data]) => (
-                                    <li key={subject} className="flex justify-between items-center px-4 py-3 rounded-xl border-2 overflow-hidden" style={{ backgroundColor: `${data.color}60` || LABEL_COLORS[0], borderColor: `color-mix(in srgb, ${data.color}, black 40%)` }}>
+                                    <li key={subject} className="label-item flex justify-between items-center px-4 py-3 rounded-xl border-2 overflow-visible relative" style={{ backgroundColor: `${data.color}60` || LABEL_COLORS[0], borderColor: `color-mix(in srgb, ${data.color}, black 40%)` }}>
                                         <div className="text-base flex items-center gap-3">
                                             <span className="font-bold text-black">{subject}</span>
                                         </div>
-                                        <span className="text-base font-medium text-black bg-white px-3 rounded-lg">
-                                            {formatTime(data.time || data)}
-                                        </span>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-base font-medium text-black bg-white px-3 rounded-lg">
+                                                {formatTime(data.time || data)}
+                                            </span>
+                                            <button
+                                                onClick={() => setActiveDropdown(activeDropdown === subject ? null : subject)}
+                                                className="p-1 hover:bg-black/10 rounded-lg transition-colors cursor-pointer flex items-center justify-center text-black"
+                                                aria-label="More options"
+                                            >
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                    <path d="M12 6C12.5523 6 13 5.55228 13 5C13 4.44772 12.5523 4 12 4C11.4477 4 11 4.44772 11 5C11 5.55228 11.4477 6 12 6Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                    <path d="M12 20C12.5523 20 13 19.5523 13 19C13 18.4477 12.5523 18 12 18C11.4477 18 11 18.4477 11 19C11 19.5523 11.4477 20 12 20Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                        {activeDropdown === subject && (
+                                            <div className="absolute right-10 top-12 w-40 bg-white border border-gray-200 rounded-xl shadow-lg z-20 py-1 overflow-hidden">
+                                                <button
+                                                    onClick={() => { clearLabel(subject); setActiveDropdown(null); }}
+                                                    className="w-full text-left px-4 py-2 hover:bg-gray-50 flex flex-col cursor-pointer transition-colors"
+                                                >
+                                                    <span className="text-sm font-semibold text-gray-800">Clear</span>
+                                                    <span className="text-[10px] text-gray-500">keep data</span>
+                                                </button>
+                                                <button
+                                                    onClick={() => { setDeleteModalData({ id: data.id, name: subject }); setActiveDropdown(null); }}
+                                                    className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 flex flex-col cursor-pointer transition-colors border-t border-gray-100"
+                                                >
+                                                    <span className="text-sm font-semibold">Delete</span>
+                                                    <span className="text-[10px] text-red-400">permanently</span>
+                                                </button>
+                                            </div>
+                                        )}
                                     </li>
                                 )
                                 )}
@@ -314,6 +395,62 @@ const Koronometre = () => {
                                     </button>
                                 </div>
                             </form>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {/* Delete Confirmation Modal */}
+            {deleteModalData && (
+                <div className="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center px-4 md:px-0">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 animate-in fade-in zoom-in duration-200">
+                        <h3 className="text-xl font-bold text-red-600 mb-2">Delete Label?</h3>
+                        <p className="text-sm text-gray-600 mb-6">
+                            Are you sure you want to permanently delete <strong>{deleteModalData.name}</strong>? All associated time logs will be deleted from the database. This action cannot be undone.
+                        </p>
+                        <div className="flex gap-3 justify-end">
+                            <button
+                                onClick={() => setDeleteModalData(null)}
+                                className="px-4 py-2 text-black hover:bg-gray-100 text-sm font-bold border border-gray-300 rounded-xl transition-colors cursor-pointer"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => {
+                                    deleteLabel(deleteModalData.id, deleteModalData.name);
+                                    setDeleteModalData(null);
+                                }}
+                                className="px-4 py-2 bg-red-600 text-white text-sm font-bold rounded-xl hover:bg-red-700 transition-all cursor-pointer"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {/* Bulk Delete Confirmation Modal */}
+            {bulkDeleteModalOpen && (
+                <div className="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center px-4 md:px-0">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 animate-in fade-in zoom-in duration-200">
+                        <h3 className="text-xl font-bold text-red-600 mb-2">Delete All Labels?</h3>
+                        <p className="text-sm text-gray-600 mb-6">
+                            Are you sure you want to permanently delete <strong>all labels and time logs</strong>? This action will wipe all your tracked data and cannot be undone.
+                        </p>
+                        <div className="flex gap-3 justify-end">
+                            <button
+                                onClick={() => setBulkDeleteModalOpen(false)}
+                                className="px-4 py-2 text-black hover:bg-gray-100 text-sm font-bold border border-gray-300 rounded-xl transition-colors cursor-pointer"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => {
+                                    deleteAllLabels();
+                                    setBulkDeleteModalOpen(false);
+                                }}
+                                className="px-4 py-2 bg-red-600 text-white text-sm font-bold rounded-xl hover:bg-red-700 transition-all cursor-pointer"
+                            >
+                                Delete All
+                            </button>
                         </div>
                     </div>
                 </div>

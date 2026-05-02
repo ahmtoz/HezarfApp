@@ -15,7 +15,7 @@ function App() {
           </header>
           <Routes>
             <Route path="/" element={
-              <main className="mx-auto pt-10 px-5 md:px-40" style={{ maxWidth: "1440px" }}>
+              <main className="mx-auto py-10 px-5 md:px-40" style={{ maxWidth: "1440px" }}>
                 <Home />
               </main>
             } />
