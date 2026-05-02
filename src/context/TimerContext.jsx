@@ -1,8 +1,19 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { useAuth } from './AuthContext';
 import { supabase } from '../supabaseClient';
+import { formatTime } from '../utils/formatTime';
 
 const TimerContext = createContext();
+
+export const formatTimeForTitle = (timeInMs) => {
+    const minutes = Math.floor(timeInMs / 60000);
+    const seconds = Math.floor((timeInMs % 60000) / 1000);
+
+    const formatMinutes = minutes.toString().padStart(2, '0');
+    const formatSeconds = seconds.toString().padStart(2, '0');
+
+    return `${formatMinutes}:${formatSeconds}`;
+};
 
 export const TimerProvider = ({ children }) => {
     const { user, loading: authLoading } = useAuth();
@@ -106,6 +117,17 @@ export const TimerProvider = ({ children }) => {
     useEffect(() => {
         localStorage.setItem('hezarf_lastLabelTime', lastLabelTime.toString());
     }, [lastLabelTime]);
+
+
+    useEffect(() => {
+        if (isRunning) {
+            document.title = `${formatTimeForTitle(time)} - Hezarfapp`;
+        } else if (time > 0) {
+            document.title = `${formatTimeForTitle(time)} - Hezarfapp`;
+        } else {
+            document.title = "Hezarfapp";
+        }
+    }, [time, isRunning]);
 
     useEffect(() => {
         if (isRunning) {

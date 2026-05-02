@@ -66,10 +66,8 @@ export default function Dashboard() {
         });
     }
 
-    // 2. Build cumulative data map
+    // 2. Build daily data map
     const weeklyDataMap = {};
-    const cumulativeSums = {};
-    Object.keys(labels || {}).forEach(labelName => { cumulativeSums[labelName] = 0; });
 
     daysOfWeek.forEach((day, index) => {
         weeklyDataMap[day] = { day };
@@ -77,14 +75,10 @@ export default function Dashboard() {
             // Only include labels that were used this week
             if (weekTotals[labelName] > 0) {
                 if (index <= currentDayIndex) {
-                    // Accumulate time for past and current days
-                    cumulativeSums[labelName] += (dailySums[day][labelName] || 0);
-                    weeklyDataMap[day][labelName] = cumulativeSums[labelName];
+                    // Daily time for past and current days
+                    weeklyDataMap[day][labelName] = dailySums[day][labelName] || 0;
                 } else {
-                    // For future days, either set to null (line stops) or keep flat.
-                    // The user requested it to stay where it left off, so we keep the cumulative sum flat.
-                    // Setting to null stops the line at today instead of drawing a flat line to Sunday.
-                    // Using null is the professional best practice for future dates.
+                    // For future days, set to null (line stops)
                     weeklyDataMap[day][labelName] = null;
                 }
             }
