@@ -56,13 +56,13 @@ function Navbar() {
                             About Us
                         </Link>
                     </li>
-                    <li className={`flex items-center rounded-lg transition-colors duration-300 ${activeMenu === "DASHBOARD" ? "bg-white" : ""}`}>
+                    <li className={`flex items-center rounded-lg transition-colors duration-300 ${activeMenu === "Analytics" ? "bg-white" : ""}`}>
                         <Link
                             to="/dashboard"
                             className="text-sm leading-[24px] font-bold cursor-pointer bg-transparent py-2 px-4 border-none w-full"
-                            onClick={() => setActiveMenu("DASHBOARD")}
+                            onClick={() => setActiveMenu("Analytics")}
                         >
-                            Dashboard
+                            Analytics
                         </Link>
                     </li>
                 </ul>

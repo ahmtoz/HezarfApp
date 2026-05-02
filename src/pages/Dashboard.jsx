@@ -3,6 +3,7 @@ import TimeAnalytics from '../components/Dashboard/Time-Analytics';
 import AsideTabAnalytics from '../assets/img/aside-tab-analytics.svg';
 import AsideTabTodo from '../assets/img/aside-tab-todo.svg';
 import AsideTabCalendar from '../assets/img/aside-tab-calendar.svg';
+import AsideTabSwitcher from '../assets/img/aside-tab-switcher.svg';
 import SpiderChartAnalyticsIcon from '../assets/img/spider-chart-analytics-icon.svg';
 import PieChartAnalyticsIcon from '../assets/img/pie-chart-analytics-icon.svg';
 
@@ -48,7 +49,7 @@ export default function Dashboard() {
             if (logDate >= startOfWeek) {
                 const dayIndex = logDate.getDay() === 0 ? 6 : logDate.getDay() - 1;
                 const dayName = daysOfWeek[dayIndex];
-                
+
                 const labelName = Object.keys(labels || {}).find(name =>
                     labels[name].id === log.label_id || name === log.label_id
                 );
@@ -57,7 +58,7 @@ export default function Dashboard() {
                     const duration = log.duration_ms !== undefined && log.duration_ms !== null
                         ? log.duration_ms
                         : (log.duration_seconds ? log.duration_seconds * 1000 : 0);
-                    
+
                     dailySums[dayName][labelName] = (dailySums[dayName][labelName] || 0) + duration;
                     weekTotals[labelName] = (weekTotals[labelName] || 0) + duration;
                 }
@@ -84,7 +85,7 @@ export default function Dashboard() {
                     // The user requested it to stay where it left off, so we keep the cumulative sum flat.
                     // Setting to null stops the line at today instead of drawing a flat line to Sunday.
                     // Using null is the professional best practice for future dates.
-                    weeklyDataMap[day][labelName] = null; 
+                    weeklyDataMap[day][labelName] = null;
                 }
             }
         });
@@ -97,27 +98,34 @@ export default function Dashboard() {
         colors[name] = data.color;
     });
 
+    const [isAsideOpen, setIsAsideOpen] = useState(true);
+
     return (
-        <main className="flex gap-6 mx-auto pt-10 pb-12 px-5 md:px-10 lg:px-40 max-w-[1440px]">
-            <aside className="flex flex-col gap-6 w-[286px] h-auto p-4 bg-light-gray rounded-lg">
-                <div>
+        <main className="flex gap-6 mx-auto pt-10 pb-12 px-5 md:px-10 lg:px-20 xl:px-40 max-w-[1440px]">
+            <aside className={`relative flex flex-col gap-6 ${isAsideOpen ? 'w-[286px]' : 'w-[64px]'} h-auto p-4 bg-light-gray rounded-lg transition-width duration-300`}>
+                <button
+                    onClick={() => setIsAsideOpen(!isAsideOpen)}
+                    className="absolute -right-3 top-4 p-1 flex items-center justify-center rounded-full bg-white cursor-pointer transition-width duration-300" style={{ boxShadow: "0px 0px 1px 0px rgba(0, 0, 0, 0.4), 0px 6px 6px -6px rgba(0, 0, 0, 0.16)" }}>
+                    {isAsideOpen ? <img src={AsideTabSwitcher} className='block w-4 h-4 rotate-180' alt="Switcher" /> : <img src={AsideTabSwitcher} className='block w-4 h-4' alt="Switcher" />}
+                </button>
+                <div className={`${isAsideOpen ? 'overflow-visible' : 'overflow-clip'}`}>
                     <ul>
                         <li>
                             <a href="#" onClick={() => setActiveTab("Analytics")} className={`flex items-center gap-3 text-sm leading-[24px] py-2 px-1 border-none rounded-md w-full cursor-pointer ${activeTab === "Analytics" ? "bg-white" : ""}`}>
                                 <img src={AsideTabAnalytics} className='w-6 h-6' alt="Analytics" />
-                                <span>Analytics</span>
+                                <span className='whitespace-nowrap'>Analytics</span>
                             </a>
                         </li>
                         <li>
                             <a href="#" onClick={() => setActiveTab("To-do List")} className={`flex items-center gap-3 text-sm leading-[24px] py-2 px-1 border-none rounded-md w-full cursor-pointer ${activeTab === "To-do List" ? "bg-white" : ""}`}>
                                 <img src={AsideTabTodo} className='w-6 h-6' alt="To-do List" />
-                                <span>To-do List</span>
+                                <span className='whitespace-nowrap'>To-do List</span>
                             </a>
                         </li>
                         <li>
                             <a href="#" onClick={() => setActiveTab("Calendar")} className={`flex items-center gap-3 text-sm leading-[24px] py-2 px-1 border-none rounded-md w-full cursor-pointer ${activeTab === "Calendar" ? "bg-white" : ""}`}>
                                 <img src={AsideTabCalendar} className='w-6 h-6' alt="Calendar" />
-                                <span>Calendar</span>
+                                <span className='whitespace-nowrap'>Calendar</span>
                             </a>
                         </li>
                     </ul>
@@ -125,7 +133,7 @@ export default function Dashboard() {
             </aside>
             <section className="flex-1 p-6 bg-light-gray rounded-lg">
                 <div className="flex flex-col gap-4">
-                    <div className='flex items-center gap-3 bg-white rounded-lg p-2 mx-2'>
+                    <div className='flex items-center gap-3 bg-white rounded-lg p-2'>
                         <img src={activeTab === "Analytics" ? AsideTabAnalytics : activeTab === "To-do List" ? AsideTabTodo : AsideTabCalendar} alt="" />
                         <h1 className='text-xl leading-[24px] text-black'>{activeTab} Overview</h1>
                     </div>
