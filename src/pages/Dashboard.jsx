@@ -125,40 +125,66 @@ export default function Dashboard() {
                     </ul>
                 </div>
             </aside>
-            <section className="flex-1 p-6 bg-light-gray rounded-lg">
-                <div className="flex flex-col gap-4">
+            <section className="flex-1 p-6 bg-light-gray rounded-lg min-h-[600px]">
+                <div className="flex flex-col gap-4 h-full">
                     <div className='flex items-center gap-3 bg-white rounded-lg p-2'>
                         <img src={activeTab === "Analytics" ? AsideTabAnalytics : activeTab === "To-do List" ? AsideTabTodo : AsideTabCalendar} alt="" />
                         <h1 className='text-xl leading-[24px] text-black'>{activeTab} Overview</h1>
                     </div>
-                    <div className={`flex gap-4 ${activeTab === "Analytics" ? "" : "hidden"}`}>
-                        <TimeAnalytics title="Total Time" time={formatTime(totalTimeMs)} />
-                        <TimeAnalytics flexWidth="flex-1" title="Completion of To-do’s" time="00:00:00" />
-                    </div>
-                    <div className={`flex gap-4 ${activeTab === "Analytics" ? "" : "hidden"}`}>
-                        <div className="flex-1">
-                            <TimeRadarChart data={pieData} formatTime={formatTime} icon={SpiderChartAnalyticsIcon} title="Spider Chart" />
+                    
+                    {/* Analytics Content */}
+                    <div className={`flex flex-col gap-4 ${activeTab === "Analytics" ? "" : "hidden"}`}>
+                        <div className="flex gap-4">
+                            <TimeAnalytics title="Total Time" time={formatTime(totalTimeMs)} />
+                            <TimeAnalytics flexWidth="flex-1" title="Completion of To-do’s" time="00:00:00" />
                         </div>
-                        <div className="flex-1">
-                            <TimePieChart data={pieData} formatTime={formatTime} icon={PieChartAnalyticsIcon} title="Pie Chart" />
+                        <div className="flex gap-4">
+                            <div className="flex-1">
+                                <TimeRadarChart data={pieData} formatTime={formatTime} icon={SpiderChartAnalyticsIcon} title="Spider Chart" />
+                            </div>
+                            <div className="flex-1">
+                                <TimePieChart data={pieData} formatTime={formatTime} icon={PieChartAnalyticsIcon} title="Pie Chart" />
+                            </div>
+                        </div>
+                        <div className="flex gap-4">
+                            <div className="flex-1">
+                                <TimeLineChart
+                                    data={weeklyData}
+                                    colors={colors}
+                                    formatTime={formatTime}
+                                    icon={AsideTabAnalytics}
+                                    title="Time Overview"
+                                />
+                            </div>
                         </div>
                     </div>
-                    <div className={`flex gap-4 ${activeTab === "Analytics" ? "" : "hidden"}`}>
-                        <div className="flex-1">
-                            <TimeLineChart
-                                data={weeklyData}
-                                colors={colors}
-                                formatTime={formatTime}
-                                icon={AsideTabAnalytics}
-                                title="Time Overview"
-                            />
+
+                    {/* To-do List Placeholder */}
+                    <div className={`flex-1 flex flex-col items-center justify-center gap-4 ${activeTab === "To-do List" ? "" : "hidden"}`}>
+                        <div className="bg-white p-12 rounded-2xl shadow-sm flex flex-col items-center text-center max-w-md w-full">
+                            <div className="w-20 h-20 bg-light-gray rounded-full flex items-center justify-center mb-6">
+                                <img src={AsideTabTodo} className="w-10 h-10 opacity-30" alt="Todo" />
+                            </div>
+                            <h2 className="text-2xl font-bold text-gray-800 mb-2">To-do List</h2>
+                            <p className="text-gray-500 mb-8">Organize your tasks and track your productivity. This feature is currently under development.</p>
+                            <span className="px-6 py-2 bg-primary/10 text-primary rounded-full text-sm font-bold uppercase tracking-wider">
+                                Coming Soon
+                            </span>
                         </div>
                     </div>
-                    <div className={`flex gap-4 ${activeTab === "To-do List" ? "" : "hidden"}`}>
-                        <h1>To-do List</h1>
-                    </div>
-                    <div className={`flex gap-4 ${activeTab === "Calendar" ? "" : "hidden"}`}>
-                        <h1>Calendar</h1>
+
+                    {/* Calendar Placeholder */}
+                    <div className={`flex-1 flex flex-col items-center justify-center gap-4 ${activeTab === "Calendar" ? "" : "hidden"}`}>
+                        <div className="bg-white p-12 rounded-2xl shadow-sm flex flex-col items-center text-center max-w-md w-full">
+                            <div className="w-20 h-20 bg-light-gray rounded-full flex items-center justify-center mb-6">
+                                <img src={AsideTabCalendar} className="w-10 h-10 opacity-30" alt="Calendar" />
+                            </div>
+                            <h2 className="text-2xl font-bold text-gray-800 mb-2">Calendar</h2>
+                            <p className="text-gray-500 mb-8">Plan your schedule and visualize your time commitments. Stay tuned for updates!</p>
+                            <span className="px-6 py-2 bg-primary/10 text-primary rounded-full text-sm font-bold uppercase tracking-wider">
+                                Coming Soon
+                            </span>
+                        </div>
                     </div>
                 </div>
             </section>

@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
+import Footer from "./components/Footer";
 import { TimerProvider } from "./context/TimerContext";
 import { AuthProvider } from "./context/AuthContext";
 import { Toaster } from "react-hot-toast";
@@ -22,6 +23,7 @@ function App() {
             } />
             <Route path="/dashboard" element={<Dashboard />} />
           </Routes>
+          <Footer />
         </TimerProvider>
       </AuthProvider>
       <Toaster />
