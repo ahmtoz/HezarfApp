@@ -14,6 +14,11 @@ function Navbar() {
 
     const toggleMenu = () => setShowMenu(!showMenu);
 
+    const switchToLogin = () => {
+        setIsSignUpModalOpen(false);
+        setIsLoginModalOpen(true);
+    };
+
     return (
         <nav className="flex md:justify-start justify-between gap-4 items-center w-full pt-5 md:pt-15 px-5 md:px-10 lg:px-40 bg-white mx-auto" style={{ maxWidth: "1440px" }}>
             <div>
@@ -116,6 +121,7 @@ function Navbar() {
             <SignUpModal
                 isOpen={isSignUpModalOpen}
                 onClose={() => setIsSignUpModalOpen(false)}
+                switchToLogin={switchToLogin}
             />
         </nav>
     )
