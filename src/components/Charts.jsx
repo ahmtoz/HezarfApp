@@ -51,7 +51,7 @@ export const TimePieChart = ({ data, formatTime, title, icon }) => {
 export const TimeRadarChart = ({ data, formatTime, title, icon }) => {
     if (data.length < 3) {
         return (
-            <div className="flex flex-col items-center justify-center bg-white rounded-xl p-4 border border-gray-100 h-full min-h-[300px] w-full text-center border-dashed border-2">
+            <div className="flex flex-col items-center justify-center bg-white rounded-xl p-4 h-full min-h-[300px] w-full text-center">
                 <h4 className="font-semibold text-gray-700 mb-2">Spider Chart</h4>
                 <p className="text-gray-500 text-sm max-w-[200px]">
                     Add at least 3 labels to see the radar chart pattern.
@@ -61,7 +61,7 @@ export const TimeRadarChart = ({ data, formatTime, title, icon }) => {
     }
 
     return (
-        <article className="flex flex-col gap-4 bg-white rounded-xl p-4 border border-gray-100 h-full min-h-[300px] w-full">
+        <article className="flex flex-col gap-4 bg-white rounded-xl p-4 h-full min-h-[300px] w-full">
             <header className="flex items-center gap-2">
                 <img src={icon} alt="" />
                 <h2>{title}</h2>
@@ -90,7 +90,7 @@ export const TimeLineChart = ({ data, colors, formatTime, formatYAxis, title, ic
 
     if (data.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center bg-white rounded-xl p-4 border border-gray-100 h-full min-h-[300px] w-full text-center border-dashed border-2">
+            <div className="flex flex-col items-center justify-center bg-white rounded-xl p-4 h-full min-h-[300px] w-full text-center">
                 <h4 className="font-semibold text-gray-700 mb-2">{title || "Line Chart"}</h4>
                 <p className="text-gray-500 text-sm max-w-[200px]">
                     No data available for the week.
@@ -100,7 +100,7 @@ export const TimeLineChart = ({ data, colors, formatTime, formatYAxis, title, ic
     }
 
     return (
-        <article className="flex flex-col gap-4 bg-white rounded-xl p-4 border border-gray-100 h-full min-h-[300px] w-full">
+        <article className="flex flex-col gap-4 bg-white rounded-xl p-4 h-full min-h-[300px] w-full">
             <header className="flex items-center gap-2">
                 {icon && <img src={icon} alt="" />}
                 <h2>{title}</h2>

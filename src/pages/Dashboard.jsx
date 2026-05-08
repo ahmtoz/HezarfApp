@@ -95,15 +95,15 @@ export default function Dashboard() {
     const [isAsideOpen, setIsAsideOpen] = useState(true);
 
     return (
-        <main className="flex gap-6 mx-auto pt-10 pb-12 px-5 md:px-10 lg:px-20 xl:px-40 max-w-[1440px]">
-            <aside className={`relative flex flex-col gap-6 ${isAsideOpen ? 'w-[286px]' : 'w-[64px]'} h-auto p-4 bg-light-gray rounded-lg transition-width duration-300`}>
+        <main className="flex flex-col-reverse md:flex-row gap-6 mx-auto pt-10 pb-12 px-5 md:px-10 lg:px-20 xl:px-40 max-w-[1440px]">
+            <aside className={`fixed md:relative bottom-0 md:bottom-auto left-0 md:left-auto w-full z-9 flex flex-col gap-6 ${isAsideOpen ? 'md:w-[286px]' : 'md:w-[64px]'} h-auto p-4 bg-light-gray rounded-lg transition-width duration-300`}>
                 <button
                     onClick={() => setIsAsideOpen(!isAsideOpen)}
-                    className="absolute -right-3 top-4 p-1 flex items-center justify-center rounded-full bg-white cursor-pointer transition-width duration-300" style={{ boxShadow: "0px 0px 1px 0px rgba(0, 0, 0, 0.4), 0px 6px 6px -6px rgba(0, 0, 0, 0.16)" }}>
+                    className="hidden md:block absolute -right-3 top-4 p-1 flex items-center justify-center rounded-full bg-white cursor-pointer transition-width duration-300" style={{ boxShadow: "0px 0px 1px 0px rgba(0, 0, 0, 0.4), 0px 6px 6px -6px rgba(0, 0, 0, 0.16)" }}>
                     {isAsideOpen ? <img src={AsideTabSwitcher} className='block w-4 h-4 rotate-180' alt="Switcher" /> : <img src={AsideTabSwitcher} className='block w-4 h-4' alt="Switcher" />}
                 </button>
                 <div className={`${isAsideOpen ? 'overflow-visible' : 'overflow-clip'}`}>
-                    <ul>
+                    <ul className="flex flex-row md:flex-col justify-between">
                         <li>
                             <a href="#" onClick={() => setActiveTab("Analytics")} className={`flex items-center gap-3 text-sm leading-[24px] py-2 px-1 border-none rounded-md w-full cursor-pointer ${activeTab === "Analytics" ? "bg-white" : ""}`}>
                                 <img src={AsideTabAnalytics} className='w-6 h-6' alt="Analytics" />
@@ -131,14 +131,14 @@ export default function Dashboard() {
                         <img src={activeTab === "Analytics" ? AsideTabAnalytics : activeTab === "To-do List" ? AsideTabTodo : AsideTabCalendar} alt="" />
                         <h1 className='text-xl leading-[24px] text-black'>{activeTab} Overview</h1>
                     </div>
-                    
+
                     {/* Analytics Content */}
                     <div className={`flex flex-col gap-4 ${activeTab === "Analytics" ? "" : "hidden"}`}>
-                        <div className="flex gap-4">
+                        <div className="flex flex-col md:flex-row gap-4">
                             <TimeAnalytics title="Total Time" time={formatTime(totalTimeMs)} />
                             <TimeAnalytics flexWidth="flex-1" title="Completion of To-do’s" time="00:00:00" />
                         </div>
-                        <div className="flex gap-4">
+                        <div className="flex flex-col md:flex-row gap-4">
                             <div className="flex-1">
                                 <TimeRadarChart data={pieData} formatTime={formatTime} icon={SpiderChartAnalyticsIcon} title="Spider Chart" />
                             </div>
