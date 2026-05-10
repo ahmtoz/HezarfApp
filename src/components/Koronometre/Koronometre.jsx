@@ -175,7 +175,7 @@ const Koronometre = () => {
                 <div className="bg-white p-6 rounded-2xl border border-[#C6C6C8] mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8 items-start relative">
 
                     {/* Bulk Actions Button */}
-                    <div className="absolute -top-12 right-0 z-30 bulk-actions-btn">
+                    <div className="absolute -top-12 right-0 bulk-actions-btn">
                         <button
                             onClick={() => setBulkDropdownOpen(!bulkDropdownOpen)}
                             className="p-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer text-gray-500"
@@ -229,7 +229,7 @@ const Koronometre = () => {
                                             </button>
                                         </div>
                                         {activeDropdown === subject && (
-                                            <div className="absolute right-10 top-12 w-40 bg-white border border-gray-200 rounded-xl shadow-lg z-20 py-1 overflow-hidden">
+                                            <div className="absolute right-4 top-12 w-40 bg-white border border-gray-200 rounded-xl shadow-lg z-20 py-1 overflow-hidden">
                                                 <button
                                                     onClick={() => { clearLabel(subject); setActiveDropdown(null); }}
                                                     className="w-full text-left px-4 py-2 hover:bg-gray-50 flex flex-col cursor-pointer transition-colors"

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import logo from "../assets/img/hezarfapp_logo.png";
 import LoginModal from "./LoginModal";
 import SignUpModal from "./SignUpModal";
@@ -11,8 +11,13 @@ function Navbar() {
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
     const [isSignUpModalOpen, setIsSignUpModalOpen] = useState(false);
     const { user, signOut } = useAuth();
+    const location = useLocation();
 
     const toggleMenu = () => setShowMenu(!showMenu);
+
+    useEffect(() => {
+        setShowMenu(false);
+    }, [location.pathname]);
 
     const switchToLogin = () => {
         setIsSignUpModalOpen(false);
