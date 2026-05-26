@@ -6,13 +6,15 @@ import { formatTime } from '../utils/formatTime';
 const TimerContext = createContext();
 
 export const formatTimeForTitle = (timeInMs) => {
-    const minutes = Math.floor(timeInMs / 60000);
+    const hours = Math.floor(timeInMs / 3600000);
+    const minutes = Math.floor((timeInMs % 3600000) / 60000);
     const seconds = Math.floor((timeInMs % 60000) / 1000);
 
+    const formatHours = hours.toString().padStart(2, '0');
     const formatMinutes = minutes.toString().padStart(2, '0');
     const formatSeconds = seconds.toString().padStart(2, '0');
 
-    return `${formatMinutes}:${formatSeconds}`;
+    return `${formatHours}:${formatMinutes}:${formatSeconds}`;
 };
 
 export const TimerProvider = ({ children }) => {

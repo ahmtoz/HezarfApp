@@ -1,8 +1,10 @@
-export const formatTime = (timeInMs) => {
-    const minutes = Math.floor(timeInMs / 60000);
+export const formatTime = (timeInMs, showMs = false) => {
+    const hours = Math.floor(timeInMs / 3600000);
+    const minutes = Math.floor((timeInMs % 3600000) / 60000);
     const seconds = Math.floor((timeInMs % 60000) / 1000);
     const milliseconds = Math.floor((timeInMs % 1000) / 10);
 
+    const formatHours = hours.toString().padStart(2, '0');
     const formatMinutes = minutes.toString().padStart(2, '0');
     const formatSeconds = seconds.toString().padStart(2, '0');
     const formatMilliseconds = milliseconds.toString().padStart(2, '0');
@@ -23,11 +25,17 @@ export const formatTime = (timeInMs) => {
 
     return (
         <span className="inline-flex items-center">
+            {renderDigits(formatHours)}
+            {divider}
             {renderDigits(formatMinutes)}
             {divider}
             {renderDigits(formatSeconds)}
-            {divider}
-            {renderDigits(formatMilliseconds)}
+            {showMs && hours < 1 ? (
+                <span className="text-[0.6em] font-medium opacity-70 ml-1 mt-[0.3em]">
+                    <span>.</span>
+                    {renderDigits(formatMilliseconds)}
+                </span>
+            ) : null}
         </span>
     );
 };
