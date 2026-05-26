@@ -21,7 +21,7 @@ function App() {
                 <Home />
               </main>
             } />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/analytics" element={<Dashboard />} />
           </Routes>
           <Footer />
         </TimerProvider>

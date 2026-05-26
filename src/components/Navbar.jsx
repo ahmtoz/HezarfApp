@@ -7,7 +7,6 @@ import { useAuth } from "../context/AuthContext";
 
 function Navbar() {
     const [showMenu, setShowMenu] = useState(false);
-    const [activeMenu, setActiveMenu] = useState("HOME");
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
     const [isSignUpModalOpen, setIsSignUpModalOpen] = useState(false);
     const { user, signOut } = useAuth();
@@ -39,38 +38,34 @@ function Navbar() {
             <div className={`fixed top-0 right-0 h-screen bg-white shadow-2xl z-10 flex flex-col gap-6 pt-12 px-16 transition-transform duration-300 ease-in-out transform ${showMenu ? 'translate-x-0' : 'translate-x-full'} md:static md:h-auto md:flex-row md:justify-between md:bg-light-gray md:shadow-none md:p-1 md:gap-1 md:rounded-lg md:translate-x-0 w-full`}>
 
                 <ul className="flex flex-col md:flex-row m-0 p-0 list-none">
-                    <li className={`flex items-center rounded-lg transition-colors duration-300 ${activeMenu === "HOME" ? "bg-white" : ""}`}>
+                    <li className={`flex items-center rounded-lg transition-colors duration-300 ${location.pathname === "/" ? "bg-white" : ""}`}>
                         <Link
                             to="/"
                             className="text-sm leading-[24px] font-bold cursor-pointer bg-transparent py-2 px-4 border-none w-full"
-                            onClick={() => setActiveMenu("HOME")}
                         >
                             HOME
                         </Link>
                     </li>
-                    <li className={`flex items-center rounded-lg transition-colors duration-300 ${activeMenu === "CONTACT" ? "bg-white" : ""}`}>
+                    <li className={`flex items-center rounded-lg transition-colors duration-300 ${location.pathname === "/contact" ? "bg-white" : ""}`}>
                         <Link
                             to="/contact"
                             className="text-sm leading-[24px] font-bold cursor-pointer bg-transparent py-2 px-4 border-none w-full"
-                            onClick={() => setActiveMenu("CONTACT")}
                         >
                             Contact Us
                         </Link>
                     </li>
-                    <li className={`flex items-center rounded-lg transition-colors duration-300 ${activeMenu === "ABOUT" ? "bg-white" : ""}`}>
+                    <li className={`flex items-center rounded-lg transition-colors duration-300 ${location.pathname === "/about" ? "bg-white" : ""}`}>
                         <Link
                             to="/about"
                             className="text-sm leading-[24px] font-bold cursor-pointer bg-transparent py-2 px-4 border-none w-full"
-                            onClick={() => setActiveMenu("ABOUT")}
                         >
                             About Us
                         </Link>
                     </li>
-                    <li className={`flex items-center rounded-lg transition-colors duration-300 ${activeMenu === "Analytics" ? "bg-white" : ""}`}>
+                    <li className={`flex items-center rounded-lg transition-colors duration-300 ${location.pathname === "/analytics" ? "bg-white" : ""}`}>
                         <Link
-                            to="/dashboard"
+                            to="/analytics"
                             className="text-sm leading-[24px] font-bold cursor-pointer bg-transparent py-2 px-4 border-none w-full"
-                            onClick={() => setActiveMenu("Analytics")}
                         >
                             Analytics
                         </Link>
