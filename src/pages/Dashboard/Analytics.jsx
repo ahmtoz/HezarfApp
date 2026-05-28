@@ -1,14 +1,23 @@
 import React, { useMemo } from 'react';
 import { useTimer } from '../../context/TimerContext';
+import { useTodo } from '../../context/TodoContext';
 import { formatTime } from '../../utils/formatTime';
 import TimeAnalytics from '../../components/Dashboard/Time-Analytics';
+import StreakAnalytics from '../../components/Dashboard/Streak-Analytics';
 import { TimePieChart, TimeRadarChart, TimeLineChart } from '../../components/Charts';
 import SpiderChartAnalyticsIcon from '../../assets/img/spider-chart-analytics-icon.svg';
 import PieChartAnalyticsIcon from '../../assets/img/pie-chart-analytics-icon.svg';
+import TimeAnalyticsIcon from "../../assets/img/time-analytics-icon.svg";
+import TasksAnalyticsIcon from "../../assets/img/todo-analytics-icon.svg";
 import AsideTabAnalytics from '../../assets/img/aside-tab-analytics.svg';
 
 function Analytics() {
     const { labels, logs } = useTimer();
+    const { todos } = useTodo();
+
+    const todosCount = useMemo(() => {
+        return todos.filter(todo => todo.is_completed).length;
+    }, [todos]);
 
     const { totalTimeMs, pieData, weeklyData, colors } = useMemo(() => {
         // Calculate total time from all labels fetched from Supabase
@@ -93,8 +102,9 @@ function Analytics() {
     return (
         <>
             <div className="flex flex-col md:flex-row gap-4">
-                <TimeAnalytics title="Total Time" time={formatTime(totalTimeMs)} />
-                <TimeAnalytics flexWidth="flex-1" title="Completion of To-do’s" time="00:00:00" />
+                <TimeAnalytics flexWidth="flex-1" title="Total Time" img={TimeAnalyticsIcon} value={formatTime(totalTimeMs)} />
+                <TimeAnalytics flexWidth="flex-1" title="Tasks Done" img={TasksAnalyticsIcon} value={todosCount} />
+                <StreakAnalytics />
             </div>
             <div className="flex flex-col md:flex-row gap-4">
                 <div className="flex-1">
