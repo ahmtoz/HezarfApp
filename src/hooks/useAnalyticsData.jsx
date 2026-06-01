@@ -10,12 +10,11 @@ export default function useAnalyticsData(logs, todos) {
         startOfToday.setHours(0, 0, 0, 0);
 
         const startOfWeek = new Date(now);
-        const currentDay = startOfWeek.getDay();
-        const diffToMonday = startOfWeek.getDate() - currentDay + (currentDay === 0 ? -6 : 1);
-        startOfWeek.setDate(diffToMonday);
+        startOfWeek.setDate(startOfWeek.getDate() - 7);
         startOfWeek.setHours(0, 0, 0, 0);
 
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const startOfMonth = new Date(now);
+        startOfMonth.setDate(startOfMonth.getDate() - 30);
         startOfMonth.setHours(0, 0, 0, 0);
 
         let dailySum = 0;
@@ -56,12 +55,11 @@ export default function useAnalyticsData(logs, todos) {
         startOfToday.setHours(0, 0, 0, 0);
 
         const startOfWeek = new Date(now);
-        const currentDay = startOfWeek.getDay();
-        const diffToMonday = startOfWeek.getDate() - currentDay + (currentDay === 0 ? -6 : 1);
-        startOfWeek.setDate(diffToMonday);
+        startOfWeek.setDate(startOfWeek.getDate() - 7);
         startOfWeek.setHours(0, 0, 0, 0);
 
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const startOfMonth = new Date(now);
+        startOfMonth.setDate(startOfMonth.getDate() - 30);
         startOfMonth.setHours(0, 0, 0, 0);
 
         let dailyCount = 0;
