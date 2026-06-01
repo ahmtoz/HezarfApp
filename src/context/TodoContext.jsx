@@ -14,7 +14,13 @@ function todoReducer(state, action) {
             return [...state, action.payload];
         case 'TOGGLE_TODO':
             return state.map(todo =>
-                todo.id === action.payload ? { ...todo, is_completed: !todo.is_completed } : todo
+                todo.id === action.payload
+                    ? {
+                        ...todo,
+                        is_completed: !todo.is_completed,
+                        completed_at: !todo.is_completed ? new Date().toISOString() : null
+                    }
+                    : todo
             );
         case 'DELETE_TODO':
             return state.filter(todo => todo.id !== action.payload);
@@ -68,6 +74,7 @@ export const TodoProvider = ({ children }) => {
         const newTodo = {
             title,
             is_completed: false,
+            completed_at: null,
         };
 
         if (user) {
@@ -100,9 +107,13 @@ export const TodoProvider = ({ children }) => {
 
         if (user) {
             try {
+                const newCompletedAt = !todoToToggle.is_completed ? new Date().toISOString() : null;
                 const { error } = await supabase
                     .from('todos')
-                    .update({ is_completed: !todoToToggle.is_completed })
+                    .update({ 
+                        is_completed: !todoToToggle.is_completed,
+                        completed_at: newCompletedAt
+                    })
                     .eq('id', id);
 
                 if (error) {

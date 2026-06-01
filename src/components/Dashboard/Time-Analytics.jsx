@@ -1,8 +1,9 @@
 import { useState } from "react";
 
-export default function TimeAnalytics({ flexWidth, title, img, value }) {
+export default function TimeAnalytics({ flexWidth, title, img, values, value }) {
 
     const [activeTime, setActiveTime] = useState("DAILY");
+    const currentValue = values ? values[activeTime] : value;
 
     return (
         <article className={`flex ${flexWidth} flex-col gap-2 p-4 bg-white rounded-2xl`}>
@@ -17,7 +18,7 @@ export default function TimeAnalytics({ flexWidth, title, img, value }) {
                     <button onClick={() => setActiveTime("MONTHLY")} className={`relative flex-1 text-sm leading-[24px] font-bold cursor-pointer py-2 transition-all duration-300 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary after:scale-x-0 after:transition-all after:origin-center after:duration-300 ${activeTime === "MONTHLY" ? "text-primary after:scale-x-100" : ""}`}>Monthly</button>
                 </div>
                 <div className="flex items-center">
-                    <p className="text-[48px] leading-[64px] text-black">{value}</p>
+                    <p className="text-[48px] leading-[64px] text-black">{currentValue}</p>
                 </div>
             </section>
         </article>

@@ -10,17 +10,19 @@ import PieChartAnalyticsIcon from '../../assets/img/pie-chart-analytics-icon.svg
 import TimeAnalyticsIcon from "../../assets/img/time-analytics-icon.svg";
 import TasksAnalyticsIcon from "../../assets/img/todo-analytics-icon.svg";
 import AsideTabAnalytics from '../../assets/img/aside-tab-analytics.svg';
+import useAnalyticsData from '../../hooks/useAnalyticsData';
 
 function Analytics() {
     const { labels, logs } = useTimer();
     const { todos } = useTodo();
+
+    const { timerAnalytics, todoAnalytics } = useAnalyticsData(logs, todos);
 
     const todosCount = useMemo(() => {
         return todos.filter(todo => todo.is_completed).length;
     }, [todos]);
 
     const { totalTimeMs, pieData, weeklyData, colors } = useMemo(() => {
-        // Calculate total time from all labels fetched from Supabase
         const total = Object.values(labels || {}).reduce((acc, label) => acc + (label.time || 0), 0);
 
         const pie = Object.entries(labels || {}).map(([name, data]) => ({
@@ -102,8 +104,8 @@ function Analytics() {
     return (
         <>
             <div className="flex flex-col md:flex-row gap-4">
-                <TimeAnalytics flexWidth="flex-1" title="Total Time" img={TimeAnalyticsIcon} value={formatTime(totalTimeMs)} />
-                <TimeAnalytics flexWidth="flex-1" title="Tasks Done" img={TasksAnalyticsIcon} value={todosCount} />
+                <TimeAnalytics flexWidth="flex-1" title="Total Time" img={TimeAnalyticsIcon} values={timerAnalytics} value={formatTime(totalTimeMs)} />
+                <TimeAnalytics flexWidth="flex-1" title="Tasks Done" img={TasksAnalyticsIcon} values={todoAnalytics} value={todosCount} />
                 <StreakAnalytics />
             </div>
             <div className="flex flex-col md:flex-row gap-4">
