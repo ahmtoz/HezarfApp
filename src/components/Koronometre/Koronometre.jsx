@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
 import { TimePieChart, TimeRadarChart } from '../Charts';
+import PieChartAnalyticsIcon from '../../assets/img/pie-chart-analytics-icon.svg';
+import SpiderChartAnalyticsIcon from '../../assets/img/spider-chart-analytics-icon.svg';
+import { useTimer } from '../../context/TimerContext';
+import useAnalyticsData from '../../hooks/useAnalyticsData.jsx';
 import startIcon from '../../assets/img/start.svg';
 import stopIcon from '../../assets/img/stop.svg';
 import resetIcon from '../../assets/img/reset.svg';
 import bulkIcon from '../../assets/img/label-trash.svg';
-import { useTimer } from '../../context/TimerContext';
 import { formatTime } from '../../utils/formatTime';
 
 const LABEL_COLORS = [
@@ -37,6 +39,10 @@ const Koronometre = () => {
         clearLabel, deleteLabel,
         clearAllLabels, deleteAllLabels
     } = useTimer();
+
+    const { logs, todos } = useTimer();
+
+    const { labelAnalytics } = useAnalyticsData(logs, todos, labels);
 
     // Labeling system state
     const [labelInput, setLabelInput] = useState('');
@@ -229,12 +235,12 @@ const Koronometre = () => {
 
                     {/* Pie Chart Section */}
                     <div className="h-full">
-                        <TimePieChart data={pieData} formatTime={formatTime} />
+                        <TimePieChart data={labelAnalytics} formatTime={formatTime} icon={PieChartAnalyticsIcon} title="Pie Chart" />
                     </div>
 
                     {/* Radar Chart Section */}
                     <div className="h-full">
-                        <TimeRadarChart data={pieData} formatTime={formatTime} />
+                        <TimeRadarChart data={labelAnalytics} formatTime={formatTime} icon={SpiderChartAnalyticsIcon} title="Spider Chart" />
                     </div>
                 </div>
             )}
