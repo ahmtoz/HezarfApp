@@ -45,9 +45,9 @@ export const TimePieChart = ({ data, formatTime, title, icon }) => {
                                             data={currentValue}
                                             cx="50%"
                                             cy="50%"
-                                            innerRadius={60}
-                                            outerRadius={80}
-                                            paddingAngle={5}
+                                            innerRadius={50}
+                                            outerRadius={70}
+                                            paddingAngle={3}
                                             dataKey="value"
                                         >
                                             {currentValue.map((entry, index) => (
@@ -55,7 +55,12 @@ export const TimePieChart = ({ data, formatTime, title, icon }) => {
                                             ))}
                                         </Pie>
                                         <Tooltip content={<CustomTooltip formatTime={formatTime} />} />
-                                        <Legend iconType="circle" iconSize={20} wrapperStyle={{ paddingTop: '20px' }} />
+                                        <Legend 
+                                            iconType="circle" 
+                                            iconSize={10} 
+                                            wrapperStyle={{ paddingTop: '20px' }} 
+                                            formatter={(value) => value && value.length > 12 ? value.substring(0, 10) + '...' : value}
+                                        />
                                     </PieChart>
                                 </ResponsiveContainer>
                             </div>
@@ -108,9 +113,13 @@ export const TimeRadarChart = ({ data, formatTime, title, icon }) => {
                         {hasData ? (
                             <div className="w-full h-full min-h-[250px]">
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <RadarChart cx="50%" cy="50%" outerRadius="80%" data={currentValue}>
+                                    <RadarChart cx="50%" cy="50%" outerRadius="70%" margin={{ top: 10, right: 10, bottom: 10, left: 10 }} data={currentValue}>
                                         <PolarGrid stroke="#e5e7eb" />
-                                        <PolarAngleAxis dataKey="name" tick={{ fill: '#4b5563', fontSize: 12 }} />
+                                        <PolarAngleAxis
+                                            dataKey="name"
+                                            tick={{ fill: '#4b5563', fontSize: 11 }}
+                                            tickFormatter={(value) => value && value.length > 12 ? value.substring(0, 10) + '...' : value}
+                                        />
                                         <PolarRadiusAxis angle={30} domain={[0, 'dataMax']} tick={false} axisLine={false} />
                                         <Radar name="Time" dataKey="value" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.5} />
                                         <Tooltip content={<CustomTooltip formatTime={formatTime} />} />

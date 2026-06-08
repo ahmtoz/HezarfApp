@@ -181,7 +181,7 @@ const Koronometre = () => {
                                 .map(([subject, data]) => (
                                     <li key={subject} className="label-item flex justify-between items-center px-4 py-3 rounded-xl border-2 overflow-visible relative" style={{ backgroundColor: `${data.color}60` || LABEL_COLORS[0], borderColor: `color-mix(in srgb, ${data.color}, black 40%)` }}>
                                         <div className="text-base flex items-center gap-3">
-                                            <span className="font-bold text-black">{subject}</span>
+                                            <span className="font-bold text-black truncate max-w-32 whitespace-nowrap text-ellipsis">{subject}</span>
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <span className="text-base font-medium text-black bg-white px-3 rounded-lg">
