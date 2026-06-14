@@ -46,7 +46,7 @@ function Navbar() {
                             HOME
                         </Link>
                     </li>
-                    <li className={`flex items-center rounded-lg transition-colors duration-300 ${location.pathname === "/contact" ? "bg-white" : ""}`}>
+                    {/* <li className={`flex items-center rounded-lg transition-colors duration-300 ${location.pathname === "/contact" ? "bg-white" : ""}`}>
                         <Link
                             to="/contact"
                             className="text-sm leading-[24px] font-bold cursor-pointer bg-transparent py-2 px-4 border-none w-full"
@@ -61,7 +61,7 @@ function Navbar() {
                         >
                             About Us
                         </Link>
-                    </li>
+                    </li> */}
                     <li className={`flex items-center rounded-lg transition-colors duration-300 ${location.pathname === "/analytics" ? "bg-white" : ""}`}>
                         <Link
                             to="/analytics"
