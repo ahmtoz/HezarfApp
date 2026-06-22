@@ -5,7 +5,7 @@ import AsideTabCalendar from '../../assets/img/aside-tab-calendar.svg';
 import AsideTabSwitcher from '../../assets/img/aside-tab-switcher.svg';
 
 import Analytics from './Analytics.jsx';
-import ToDoList from './Todo.jsx';
+import TodoCanvas from '../../components/todo/TodoCanvas.tsx';
 import Calendar from './Calendar.jsx';
 
 export default function Dashboard() {
@@ -58,7 +58,7 @@ export default function Dashboard() {
 
                     {/* To-do List Placeholder */}
                     <div className={`flex-1 flex flex-col items-center justify-center gap-4 ${activeTab === "To-do List" ? "" : "hidden"}`}>
-                        <ToDoList />
+                        <TodoCanvas />
                     </div>
 
                     {/* Calendar Placeholder */}

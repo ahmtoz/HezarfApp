@@ -5,7 +5,7 @@ import Dashboard from "./pages/Dashboard/Dashboard.jsx";
 import Footer from "./components/Footer";
 import { TimerProvider } from "./context/TimerContext.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
-import { TodoProvider } from "./context/TodoContext.jsx";
+import { TodoProvider } from "./context/TodoContext";
 import { Toaster } from "react-hot-toast";
 
 function App() {
