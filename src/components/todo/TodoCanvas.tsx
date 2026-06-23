@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { useTodo } from '../../context/TodoContext';
 import { CanvasBlock, Task } from '../../types/todo';
 
@@ -11,13 +11,43 @@ const getWeekString = (date: Date): string => {
     return `${d.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
 };
 
+const getFormattedWeekRange = (date: Date): string => {
+    const current = new Date(date);
+    const day = current.getDay();
+    const diff = current.getDate() - day + (day === 0 ? -6 : 1);
+    const monday = new Date(current.setDate(diff));
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+
+    const monthNames = [
+        'Jan', 'Feb', 'March', 'Apr', 'May', 'June',
+        'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'
+    ];
+
+    const startDay = monday.getDate();
+    const startMonth = monthNames[monday.getMonth()];
+    const startYear = monday.getFullYear();
+
+    const endDay = sunday.getDate();
+    const endMonth = monthNames[sunday.getMonth()];
+    const endYear = sunday.getFullYear();
+
+    if (startYear !== endYear) {
+        return `${startYear} ${startDay} ${startMonth} - ${endYear} ${endDay} ${endMonth}`;
+    } else if (startMonth !== endMonth) {
+        return `${startYear} ${startDay} ${startMonth} - ${endDay} ${endMonth}`;
+    } else {
+        return `${startYear} ${startDay} ${startMonth} - ${endDay} ${startMonth}`;
+    }
+};
+
 const getDaysOfWeek = (date: Date): { name: string; dateStr: string; label: string }[] => {
     const current = new Date(date);
     const day = current.getDay();
     const diff = current.getDate() - day + (day === 0 ? -6 : 1);
     const monday = new Date(current.setDate(diff));
 
-    const dayNames = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
+    const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     const days = [];
 
     for (let i = 0; i < 7; i++) {
@@ -49,13 +79,45 @@ export default function TodoCanvas() {
 
     const [currentDate, setCurrentDate] = useState<Date>(new Date());
     const [newTaskTitles, setNewTaskTitles] = useState<{ [blockId: string]: string }>({});
+    const dateInputRef = useRef<HTMLInputElement>(null);
 
     const selectedWeek = useMemo(() => getWeekString(currentDate), [currentDate]);
+    const formattedWeekRange = useMemo(() => getFormattedWeekRange(currentDate), [currentDate]);
     const weekDays = useMemo(() => getDaysOfWeek(currentDate), [currentDate]);
 
     const activeBlocks = useMemo(() => {
         return blocks.filter(b => b.weekId === selectedWeek);
     }, [blocks, selectedWeek]);
+
+    // Touch Swipe Navigation for Weeks
+    const touchStartX = useRef<number | null>(null);
+    const touchEndX = useRef<number | null>(null);
+
+    const handleTouchStart = (e: React.TouchEvent) => {
+        touchStartX.current = e.targetTouches[0].clientX;
+    };
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+        touchEndX.current = e.targetTouches[0].clientX;
+    };
+
+    const handleTouchEnd = () => {
+        if (touchStartX.current === null || touchEndX.current === null) return;
+        const diffX = touchStartX.current - touchEndX.current;
+        const minSwipeDistance = 50; // pixels
+
+        if (diffX > minSwipeDistance) {
+            // Swiped Left -> Next Week
+            handleNextWeek();
+        } else if (diffX < -minSwipeDistance) {
+            // Swiped Right -> Previous Week
+            handlePrevWeek();
+        }
+
+        // Reset
+        touchStartX.current = null;
+        touchEndX.current = null;
+    };
 
     const handlePrevWeek = () => {
         setCurrentDate(prev => {
@@ -77,6 +139,17 @@ export default function TodoCanvas() {
         setCurrentDate(new Date());
     };
 
+    const handleDateTextClick = () => {
+        if (dateInputRef.current) {
+            try {
+                dateInputRef.current.showPicker();
+            } catch (err) {
+                console.error("Failed to show picker:", err);
+                dateInputRef.current.click();
+            }
+        }
+    };
+
     const handleAddTask = (blockId: string) => {
         const title = newTaskTitles[blockId] || '';
         if (title.trim()) {
@@ -92,52 +165,51 @@ export default function TodoCanvas() {
 
     return (
         <div className="flex flex-col w-full min-h-[650px] bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-            {/* Canvas Üst Kontrol Paneli */}
             <div className="flex flex-col md:flex-row md:items-center justify-between p-6 bg-white border-b border-gray-100 gap-4">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h2 className="text-xl font-bold text-gray-800">Haftalık Görev Tuvali</h2>
-                        <p className="text-xs text-gray-400">Esnek panellerle haftanızı tasarlayın</p>
-                    </div>
-                </div>
 
-                {/* Hafta Gezinme Araçları */}
-                <div className="flex items-center bg-light-gray p-1 rounded-xl gap-1">
+                <div className="flex items-center bg-[#f3f4f6] p-1.5 rounded-2xl gap-1 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] border border-gray-100/50">
                     <button
                         onClick={handlePrevWeek}
-                        className="p-2 hover:bg-white rounded-lg transition-all duration-200 text-gray-600 hover:text-primary hover:shadow-sm hover:cursor-pointer"
-                        title="Önceki Hafta"
+                        className="p-2 hover:bg-white rounded-xl transition-all duration-200 text-gray-500 hover:text-primary hover:shadow-sm hover:cursor-pointer active:scale-95"
+                        title="Previous Week"
                     >
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
                         </svg>
                     </button>
-                    <button
-                        onClick={handleCurrentWeek}
-                        className="px-3 py-1 bg-white hover:bg-gray-50 rounded-lg text-xs font-semibold text-primary shadow-sm hover:cursor-pointer transition-all duration-200"
+
+                    <div
+                        onClick={handleDateTextClick}
+                        className="relative group flex items-center justify-center px-4 py-1.5 rounded-xl hover:bg-white transition-all duration-200 cursor-pointer w-[210px] flex-shrink-0"
                     >
-                        Bu Hafta
-                    </button>
-                    <span className="px-3 text-sm font-bold text-gray-700 min-w-[100px] text-center">
-                        {selectedWeek}
-                    </span>
+                        <span className="text-xs md:text-sm font-bold text-gray-700 select-none tracking-tight text-center">
+                            {formattedWeekRange}
+                        </span>
+                        <input
+                            ref={dateInputRef}
+                            type="date"
+                            value={currentDate.toISOString().substring(0, 10)}
+                            onChange={(e) => {
+                                if (e.target.value) {
+                                    setCurrentDate(new Date(e.target.value));
+                                }
+                            }}
+                            className="absolute inset-0 opacity-0 pointer-events-none w-full h-full"
+                            title="Select Date"
+                        />
+                    </div>
+
                     <button
                         onClick={handleNextWeek}
-                        className="p-2 hover:bg-white rounded-lg transition-all duration-200 text-gray-600 hover:text-primary hover:shadow-sm hover:cursor-pointer"
-                        title="Sonraki Hafta"
+                        className="p-2 hover:bg-white rounded-xl transition-all duration-200 text-gray-500 hover:text-primary hover:shadow-sm hover:cursor-pointer active:scale-95"
+                        title="Next Week"
                     >
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                         </svg>
                     </button>
                 </div>
 
-                {/* Yeni Blok Ekleme Butonları */}
                 <div className="flex items-center gap-2">
                     <button
                         onClick={() => addBlock(selectedWeek, 'text')}
@@ -146,7 +218,7 @@ export default function TodoCanvas() {
                         <svg className="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        + Metin Bloğu
+                        + Text
                     </button>
                     <button
                         onClick={() => addBlock(selectedWeek, 'todo')}
@@ -155,7 +227,7 @@ export default function TodoCanvas() {
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                         </svg>
-                        + Görev Bloğu
+                        + To Do
                     </button>
                 </div>
             </div>
@@ -164,6 +236,9 @@ export default function TodoCanvas() {
             <div
                 style={dotGridStyle}
                 className="flex-1 p-6 md:p-8 bg-gray-50/50 min-h-[500px]"
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
             >
                 {activeBlocks.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-gray-400 text-center gap-3">
@@ -173,8 +248,8 @@ export default function TodoCanvas() {
                             </svg>
                         </div>
                         <div>
-                            <p className="text-gray-500 font-medium">Bu haftaya ait henüz blok eklenmemiş.</p>
-                            <p className="text-xs text-gray-400 mt-1">Yukarıdaki butonları kullanarak yeni bloklar oluşturun.</p>
+                            <p className="text-gray-500 font-medium">No blocks added yet.</p>
+                            <p className="text-xs text-gray-400 mt-1">Add new blocks using the buttons above.</p>
                         </div>
                     </div>
                 ) : (
@@ -184,27 +259,25 @@ export default function TodoCanvas() {
                                 key={block.id}
                                 className="group relative bg-white border border-gray-100 hover:border-primary/20 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 flex flex-col overflow-hidden"
                             >
-                                {/* Silme ve Ayarlar Butonları */}
                                 <button
                                     onClick={() => deleteBlock(block.id)}
                                     className="absolute top-4 right-4 p-1 rounded-lg text-gray-300 hover:text-secondary hover:bg-secondary/5 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:cursor-pointer"
-                                    title="Bloğu Sil"
+                                    title="Delete Block"
                                 >
                                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                     </svg>
                                 </button>
 
-                                {/* Blok Türüne Göre Render */}
                                 {block.type === 'text' ? (
                                     <div className="p-5 flex flex-col h-full min-h-[220px]">
                                         <div className="flex items-center gap-2 mb-3">
-                                            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Not Defteri</span>
+                                            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Notes</span>
                                         </div>
                                         <textarea
                                             value={block.content}
                                             onChange={(e) => updateBlock(block.id, { type: 'text', content: e.target.value })}
-                                            placeholder="Notlarınızı buraya yazın..."
+                                            placeholder="Write your notes here..."
                                             className="flex-1 w-full text-sm text-gray-700 bg-transparent resize-none border-0 focus:ring-0 focus:outline-none placeholder-gray-300"
                                         />
                                     </div>
@@ -256,21 +329,6 @@ export default function TodoCanvas() {
                                                             className={`flex-1 text-xs bg-transparent border-0 focus:ring-0 focus:outline-none text-gray-700 py-0.5 ${task.isCompleted ? 'line-through text-gray-400' : ''}`}
                                                         />
 
-                                                        {/* Gün Atama (Date Assign) Seçici */}
-                                                        <select
-                                                            value={task.assignedDate || ''}
-                                                            onChange={(e) => assignTaskToDate(block.id, task.id, e.target.value || null)}
-                                                            className="text-[10px] px-1.5 py-0.5 bg-white border border-gray-200 rounded-lg text-gray-500 hover:border-primary hover:cursor-pointer focus:outline-none transition-colors"
-                                                            title="Güne Ata"
-                                                        >
-                                                            <option value="">Ata...</option>
-                                                            {weekDays.map(day => (
-                                                                <option key={day.dateStr} value={day.dateStr}>
-                                                                    {day.name.substring(0, 3)}
-                                                                </option>
-                                                            ))}
-                                                        </select>
-
                                                         {/* Alt Görev Silme */}
                                                         <button
                                                             onClick={() => deleteTaskFromBlock(block.id, task.id)}
@@ -293,14 +351,14 @@ export default function TodoCanvas() {
                                                 value={newTaskTitles[block.id] || ''}
                                                 onChange={(e) => setNewTaskTitles(prev => ({ ...prev, [block.id]: e.target.value }))}
                                                 onKeyDown={(e) => e.key === 'Enter' && handleAddTask(block.id)}
-                                                placeholder="Yeni görev..."
+                                                placeholder="New Task..."
                                                 className="flex-1 text-xs px-3 py-2 bg-light-gray rounded-xl border border-transparent focus:border-primary focus:bg-white focus:outline-none transition-all duration-200"
                                             />
                                             <button
                                                 onClick={() => handleAddTask(block.id)}
                                                 className="px-3 py-2 bg-primary text-white rounded-xl text-xs font-semibold hover:bg-primary-hover hover:cursor-pointer transition-colors"
                                             >
-                                                Ekle
+                                                Add
                                             </button>
                                         </div>
                                     </div>
